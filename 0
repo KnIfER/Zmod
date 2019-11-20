@@ -1,0 +1,318 @@
+<!doctype html>
+<html>
+<head>
+    <title>Zygote Body 3D Anatomy Online Visualizer | Offline Human Anatomy 3D</title>
+
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8"/>
+    <meta name="viewport" id="view1" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="csrf-token" content="Ad3ytq64Wr7zlz4nMinkXh94RyUyU1FRKLy4C7cy">
+    <meta name="cdn-enabled" content="1"/>
+	<meta name="description" content="Zygote Body is a free online 3D anatomy atlas. View, isolate, and learn human anatomy structures with Zygote Body.">
+
+    <script type="text/javascript">
+        CDN_ENABLED = document.querySelector("meta[name='cdn-enabled']").getAttribute('content');
+		postInit=function(){
+			document.getElementById('view1').setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no');
+			//console.log("doing!!!");
+		}
+    </script>
+
+    <!-- Fonts -->
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400,600' rel='stylesheet' type='text/css'>
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css' rel='stylesheet' type='text/css'>
+
+    <!-- CSS -->
+    
+    
+
+    <!-- jQuery -->
+    <link type="text/css" rel="stylesheet" href="body/scripts/libs/jqueryui/1.9.2/themes/base/jquery-ui.css"/>
+    <link type="text/css" rel="stylesheet" href="body/css/Sansation/stylesheet.css"/>
+
+    <script type="text/javascript" src="body/scripts/libs/jqueryui/1.9.2/jquery-1.8.3.js"></script>
+    <script type="text/javascript" src="body/scripts/libs/jqueryui/1.9.2/ui/jquery-ui.js"></script>
+    <script type="text/javascript" src="body/scripts/libs/ext/jquery.dialogextend.min.js"></script>
+    <script type="text/javascript" src="body/scripts/langs/jquery.i18n.js"></script>
+    <script type="text/javascript" src="body/scripts/libs/jstree/jquery.jstree.js"></script>
+    <script type="text/javascript" src="body/scripts/libs/jquery-paintable.js"></script>
+    <script type="text/javascript" src="body/scripts/libs/jquery.ui.touch-punch.min.js"></script>
+
+    
+    <!-- o3v styles -->
+    <link type="text/css" rel="stylesheet" href="body/main_ui.css"/>
+    <link type="text/css" rel="stylesheet" href="body/css/general.css"/>
+
+    <!-- Local -->
+    <script type="text/javascript">
+        var o3v = {}; // open-3d-viewer namespace
+    </script>
+
+    <!-- Webgl -->
+    <script type="text/javascript" src="body/scripts/webgl.js"></script>
+
+    <!-- o3v specific -->
+    <script type="text/javascript" src="models/models.js"></script>
+    <script type="text/javascript" src="body/scripts/o3v.js"></script>
+    <script type="text/javascript" src="body/scripts/account.js"></script>
+    <script type="text/javascript" src="body/scripts/quiz.js"></script>
+    <script type="text/javascript" src="body/scripts/paint.js"></script>
+
+    <script type="text/javascript">
+
+        // Start viewer
+        $(document).ready(function () {
+
+            // The assignment to window.viewer_ is ONLY for debugging.
+            // This variable should NEVER be accessed from code.
+            window.viewer_ = new o3v.Viewer();
+        });
+    </script>
+
+    <link type="text/css" rel="stylesheet" href="body/scripts/libs/facebox/facebox.css" media="screen"/>
+    <script type="text/javascript" src="body/scripts/libs/facebox/facebox.js"></script>
+
+    <!-- Facebox popups for links -->
+    <script type="text/javascript">
+        jQuery(document).ready(function ($) {
+            jQuery('a[rel*=facebox]').facebox({allow_close: false});
+            jQuery('.validationmsg').hide();
+
+            
+                        jQuery('#flag-jp img').click(function () {
+                window.location.href = 'http://zygotebody.jp';
+            });
+            jQuery('#flag-us img').click(function () {
+                return false;
+            });
+            
+                    });
+
+        function switchTo(window) {
+            jQuery(document).trigger('close.facebox');
+
+            function clicky() {
+                jQuery.facebox({div: '#' + window});
+            }
+
+            setTimeout(clicky, 500);
+        }
+
+        function form_submit(form) {
+
+            $(form).submit(function (event) {
+                event.preventDefault();
+            });
+        }
+    </script>
+
+    <!-- Google Analytics -->
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-26176022-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics -->
+    <!-- Google Tag Manager -->
+    <script>
+        (function (w, d, s, l, i) {
+            w[l] = w[l] || [];
+            w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            });
+            var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
+            j.async = true;
+            j.src =
+                'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+            f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-PQ2XBD4');
+    </script>
+    <!-- End Google Tag Manager -->
+
+    <style>
+        .ui-slider .ui-slider-handle {
+            cursor: grab;
+        }
+
+            </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript>
+    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PQ2XBD4" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+</noscript>
+<!-- End Google Tag Manager (noscript) -->
+<!-- Canvas for verifying webgl -->
+<!-- TODO(dkogan): dynamically create this -->
+<canvas id="gltest" style="display:none"></canvas>
+
+<!-- Container for labels -->
+<!-- TODO(dkogan): dynamically create this and use css -->
+<div id="labelcontainer" style="width:0px; height:0px; left:0px; top:0px; position:absolute; z-index:5"></div>
+<div id="account-line" style="display:none">
+    <div id="account-links">
+        <a href="settings" target="_blank">Your Settings</a>
+        &nbsp;&nbsp;|&nbsp;&nbsp;
+        <a href="logout">Logout</a>
+    </div>
+
+    <div id="account-name" class="account-name">
+    </div>
+</div>
+
+<div id="guest-line" style="display:none">
+    <div id="account-links">
+        <a href="welcome" target="_blank">Learn More</a>
+        &nbsp;&nbsp;|&nbsp;&nbsp;
+        <a href="login">Sign In</a>
+    </div>
+    <a href="pricing">
+        <div id="account-type"><a href="pricing"><div class="acct_type_btn_lite"></div></a></div>
+    </a>
+</div>
+
+<div id="premium" class="">
+</div>
+
+<!--div id="attrib_zy" class="attrib_zy">
+    <div id="footer-left">
+        <a href="http://facebook.com/zygotebody" target="_blank"><img src="body/images/social-facebook.png" alt="Facebook"/></a>&nbsp;&nbsp;
+        <a href="http://twitter.com/zygotebody" target="_blank"><img src="body/images/social-twitter.png" alt="Twitter"/></a>&nbsp;&nbsp;
+        |&nbsp;&nbsp;
+
+        <a href="#embed" rel="facebox" id="link-embed"><span style="font-weight:bold;">Embed</span>&nbsp;&nbsp;</a>
+    </div>
+    <div id="footer-right">
+        <a href="terms" target="_blank">Terms</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+        <a href="contact" target="_blank">Contact</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+        <a href="about" target="_blank">About</a>
+    </div>
+</div-->
+
+<div id="copyright">ZygoteBody&trade; &amp; 3D data &copy; 2012-2017 Zygote Media Group, Inc.</div>
+
+<!-- Quick help panel -->
+
+<a href="#help" rel="facebox" id="link-help"><img id="help-hidden" class="help-hidden" src="body/images/help.png" alt="?"/></a>
+<div id="opac_idx" style="display:none;left:50%;top:100%;position:absolute;margin-top:-50px;color:#06F;z-index:3;margin-left:-89px"></div>
+
+<div id="r0" class="indicator"></div>
+<div id="r1" class="indicator"></div>
+<div id="r2" class="indicator"></div>
+<div id="r3" class="indicator"></div>
+<div id="r4" class="indicator"></div>
+<div id="r5" class="indicator"></div>
+<div id="r6" class="indicator"></div>
+<div id="r7" class="indicator"></div>
+
+<div id="loading-feedback" class="loading-feedback">
+    <label>Please Wait</label>
+    <div><span id="loading-bar" style="width: 0px;"></span></div>
+</div>
+
+<!--
+--------------------------------------------------------- HTML for popups ----------------------------------------------------
+-->
+
+<div id="embed" class="pop">
+    <div id="embed-content" class="pop-margin">
+        <b>Embed ZygoteBody</b>
+        <br>
+        <br>
+        <input style="width: 542px" value='<iframe width="1110" height="740" src="https://www.zygotebody.com" frameborder="0" ></iframe>'/>
+    </div>
+</div>
+
+<div id="help" class="pop">
+    <div id="help-content" class="pop-margin">
+        <b>Quick guide</b>
+        <br>
+        <br>
+        <b>Navigation</b>
+        <ul>
+            <li>Click+drag with the mouse to rotate, scroll to zoom.</li>
+            <li>Or use the buttons in the upper left. The Home button resets the view.</li>
+            <li>Change from Capsule to Orbit mode in the upper right to enable full 3d </li>
+            <li>rotation and hold Ctrl down to pan the view. (Premium users only)</li>
+        </ul>
+        <b>Slider</b>
+        <ul>
+            <li>Use the opacity slider on the left to reveal layers.</li>
+            <li>Click on the toggle below the slider to control layers individually.</li>
+        </ul>
+        <b>Selection</b>
+        <ul>
+            <li>Use the searchbox at the upper right to search, or click on entities to select them.</li>
+            <li>Click on the background or on the X to undo selection.</li>
+            <li>Ctrl+click on entities to quickly hide entities. (Cmd+click on mac.)</li>
+            <li>Shift+click on entities or labels (or click on the 'pin' icon in a label) to pin an entity. This will keep it selected while you select more.</li>
+            <li>Use the visibility icon on an entities name to hide an item.  Unlike Ctrl+clicking an entity the visibility tool will leave hide the items until 'Unhide All' is clicked on the upper right.</li>
+            <li>Use the 'Zoom to' tool on the items name to center the view on the item. </li>
+            <li>Use the down arrow on the items name to reveal information about the item.  </li>
+            <li>Use the 'Pin' tool on the items name to pin an item allowing you to select multiple items. </li>
+        </ul>
+        <b>Models</b>
+        <ul>
+            <li>Use the model select icon above the anatomy slider on the left to load different models.  </li>
+        </ul>
+        <b>Premium Tools</b>
+        <ul>
+            <li>My Scenes allows you to load and save scenes you have created.  All annotations, pins and visible items will be saved.</li>
+            <li>Zygote Scenes is a collection of scenes created by Zygote Media Group with annotations identifying anatomical landmarks.</li>
+            <li>Hierarchy is a list of all the entities you have in your current scene.  You can turn parts on and off using the check marks by each object or group of objects.</li>
+            <li>Annotations allows you to create your own notes and markers that will be saves when you save your scene.</li>
+            <li>Tools:</li>
+            <ul>
+                <li>Pick returns you to the default mode of picking parts and rotating your camera.</li>
+                <li>Slice allows you to slice the parts in your scene in either an X, Y or Z plane. </li>
+                <li>Explode moves all the parts in your scene away form a central point that you can interactively position.</li>
+                <li>Quiz when enabled when you pick a part rather than displaying the part's name a multiple choice menu will appear allowing you to quiz yourself.</li>
+            </ul>
+        </ul>
+        <b>Professional Tools</b>
+        <ul>
+            <li>The snapshot icon at the top center will take a snapshot of your scene that can then be saved as a jpg or drawn on with the included pen tools. </li>
+        </ul>
+    </div>
+</div>
+
+<style>
+    .my-selectable .ui-selecting {
+        background: #FECA40;
+    }
+
+    .my-selectable .ui-selected {
+        background: #F39814;
+        color: white;
+    }
+
+    .my-selectable {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .my-selectable li {
+        margin: 3px;
+        padding: 0.4em; /* height: 18px; */
+    }
+</style>
+<script>
+    $(function () {
+        $("#selectable").selectable();
+    });
+</script>
+</body>
+</html>

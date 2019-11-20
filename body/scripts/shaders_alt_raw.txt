@@ -1,0 +1,298 @@
+/** shader_fragment **/
+
+#ifdef GL_ES
+precision mediump float;
+#endif
+
+#define M_PI 3.1415926535897932384626433832795
+#define M_INV_PI 0.31830988618379067153776752674503
+
+varying vec4 vLighting;
+
+varying vec3 v_vertex;
+varying vec4 vNormal;
+varying vec4 vViewVector;
+varying vec4 vReflection;
+varying vec2 vTexCoord;
+
+uniform sampler2D u_texture;
+uniform float u_opacity;
+uniform vec4  u_slice1;
+uniform vec4  u_slice2;
+uniform vec4  u_slice3;
+uniform float u_roughness;
+uniform mat4  u_mv;
+
+float Pow5(float v) {
+	return v * v * v * v * v;
+}
+
+float SmithJointGGXVisibilityTerm (float NdotL, float NdotV, float roughness)
+{
+	float a = roughness;
+	float lambdaV = NdotL * (NdotV * (1.0 - a) + a);
+	float lambdaL = NdotV * (NdotL * (1.0 - a) + a);
+
+	return 0.5 / (lambdaV + lambdaL + 1e-5);
+}
+
+float GGXTerm (float NdotH, float roughness)
+{
+	float a2 = roughness * roughness;
+	float d = (NdotH * a2 - NdotH) * NdotH + 1.0;
+	return M_INV_PI * a2 / (d * d + 1e-7);
+}
+
+vec3 FresnelTerm (vec3 F0, float cosA)
+{
+	float t = Pow5 (1.0 - cosA);
+	return F0 + (1.0-F0) * t;
+}
+
+
+float BRDF_kd_c(float NV, float NL, float LH, float roughness) {
+	float fd90 = 0.5 + 2.0 * LH * LH * roughness;
+	float lightScatter   = (1.0 + (fd90 - 1.0) * Pow5(1.0 - NL));
+	float viewScatter    = (1.0 + (fd90 - 1.0) * Pow5(1.0 - NV));
+	return lightScatter * viewScatter;
+}
+vec3 BRDF(vec3 kD, vec3 kS, vec3 normal, vec3 lightVector, vec3 lightColor, vec3 viewVector, float roughness ) {
+	vec3  halfVector = normalize(viewVector + lightVector);
+
+	float NV = clamp(dot(normal, viewVector), 0.0, 1.0);
+	float NL = clamp(dot(normal, lightVector), 0.0, 1.0);
+	float NH = clamp(dot(normal, halfVector), 0.0, 1.0);
+	float LV = clamp(dot(lightVector, viewVector), 0.0, 1.0);
+	float LH = clamp(dot(lightVector, halfVector), 0.0, 1.0);
+
+	float kd_c = BRDF_kd_c(NV, NL, LH, roughness) * NL / M_PI;
+
+	float V = SmithJointGGXVisibilityTerm (NL, NV, roughness * roughness);
+	float D = GGXTerm (NH, roughness * roughness);
+	float kS_c = max(0.0, V * D * NL);
+
+	return kD * kd_c * lightColor + kS_c * lightColor * FresnelTerm(kS, LH);
+	
+}
+
+float modI(float a,float b) {
+	float m=a-floor((a+0.5)/b)*b;
+	return floor(m+0.5);
+}
+
+vec2 Hammersley(int i, int n) {
+    float rx = float(i) / float(n);
+	float x = 0.0;
+	float f = 0.5;
+
+	if(i > 0) {
+		x += f * modI(float(i), float(2));
+		i /= 2;
+		f *= 0.5;
+	}
+	if(i > 0) {
+		x += f * modI(float(i), float(2));
+		i /= 2;
+		f *= 0.5;
+	}
+	if(i > 0) {
+		x += f * modI(float(i), float(2));
+		i /= 2;
+		f *= 0.5;
+	}
+	if(i > 0) {
+		x += f * modI(float(i), float(2));
+		i /= 2;
+		f *= 0.5;
+	}
+	if(i > 0) {
+		x += f * modI(float(i), float(2));
+		i /= 2;
+		f *= 0.5;
+	}
+
+	return vec2(rx, x);
+}
+
+void main() {
+  vec4 vertex = vec4(v_vertex, 1.0);
+  if (dot(vertex, u_slice1) > 0.0 &&
+      dot(vertex, u_slice2) > 0.0 &&
+      dot(vertex, u_slice3) > 0.0) discard;
+
+  vec3 nn = normalize(vNormal.xyz);
+  vec3 color = texture2D(u_texture, vTexCoord).rgb;
+
+  vec3 accum = vec3(0.0, 0.0, 0.0);
+  vec3 viewVector = vViewVector.xyz;
+  vec3 normal = nn;
+
+  float max_c = max(max(color.r, color.g), color.b);
+  float avg_c = (color.r + color.g + color.b) / 3.0;
+  vec3 skin = vec3(0.75, 0.5, 0.5);
+  float dist = log(distance(color, skin)) ;
+   
+  float roughness = u_roughness;
+  float metallic = 0.0;
+  vec3 kS0 = vec3(0.04, 0.04, 0.04);
+
+  vec3 kD = color * (1.0 - metallic);
+  vec3 kS = mix(kS0, color, metallic);
+  float gl = 0.8;
+  float ml = 2.5 * gl;
+  float el = 2.5 * gl;
+  float fl = 0.9 * gl;
+  {
+          vec3 lightVector = normalize(vec3(-1.0, 1.0, 1.0));
+          vec3 lightColor = vec3(1.0, 1.0, 1.0) * ml;
+          accum += BRDF(kD, kS, normal, lightVector, lightColor, viewVector, roughness);
+  }
+  {
+          vec3 lightVector = normalize(vec3(1.0,-0.7,-0.2));
+          vec3 lightColor = vec3(0.3, 0.3, 0.7) * el;
+          accum += BRDF(kD, kS, normal, lightVector, lightColor, viewVector, roughness);
+  }
+  {
+          vec3 lightVector = normalize(vec3(-1.0,-0.1, 1.0));
+          vec3 lightColor = vec3(1.0, 1.0, 1.0) * fl;
+          accum += BRDF(kD, kS, normal, lightVector, lightColor, viewVector, roughness);
+  }
+  {
+          vec3 lightVector = normalize(vec3(-0.0,-1.0, 1.0));
+          vec3 lightColor = vec3(1.0, 1.0, 1.0) * fl;
+          accum += BRDF(kD, kS, normal, lightVector, lightColor, viewVector, roughness);
+  }
+  {
+          vec3 lightVector = normalize(vec3( 1.0, 0.1, 1.0));
+          vec3 lightColor = vec3(1.0, 1.0, 1.0) * fl;
+          accum += BRDF(kD, kS, normal, lightVector, lightColor, viewVector, roughness);
+  }
+
+  gl_FragData[0] = vec4(accum * u_opacity, u_opacity);
+}
+
+
+
+
+/** shader_fragment_id **/
+
+precision highp float;
+varying vec4 v_color;
+varying vec3 v_vertex;
+
+uniform vec4  u_slice1;
+uniform vec4  u_slice2;
+uniform vec4  u_slice3;
+
+void main() {
+  vec4 vertex = vec4(v_vertex, 1.0);
+  if (dot(vertex, u_slice1) > 0.0 &&
+      dot(vertex, u_slice2) > 0.0 &&
+      dot(vertex, u_slice3) > 0.0) discard;
+
+  gl_FragColor = v_color;
+}
+
+/** shader_vertex **/
+precision mediump float;
+attribute vec3 a_position;
+attribute vec2 a_texcoord;
+attribute vec3 a_normal;
+
+uniform mat4 u_mv;
+uniform mat4 u_mvp;
+uniform mat4 u_proj;
+uniform mat4 u_effect;
+
+varying vec3 v_vertex;
+varying vec4 vNormal;
+varying vec4 vViewVector;
+varying vec4 vReflection;
+varying vec2 vTexCoord;
+
+void main() {
+  v_vertex    = a_position;
+  gl_Position = u_mvp * u_effect * vec4(a_position, 1.0);
+
+  vec4 normal = u_mv * u_effect * vec4(a_normal.x, a_normal.y, a_normal.z, 0.0);
+  vec4 viewVector = vec4(0, 0, 1, 0);//vec4(u_mv[0][2], u_mv[1][2], u_mv[2][2], 1.0);
+
+  vNormal     = normal;
+  vTexCoord   = a_texcoord;
+  vReflection = -viewVector - 2.0 * dot(viewVector.xyz, normal.xyz) * normal;
+  vViewVector = viewVector;
+}
+
+/** shader_vertex_id **/
+
+uniform mat4 u_mvp;
+uniform mat4 u_effect;
+uniform float u_colorScale;
+
+attribute vec3 a_position;
+attribute vec3 a_normal;
+attribute float a_colorIndex;
+
+varying vec4 v_color;
+varying vec3 v_normal;
+varying vec3 v_vertex;
+
+void main() {
+  v_vertex    = a_position;
+  float scaledColor = a_colorIndex * u_colorScale;
+  float redColor = floor(scaledColor / (256.0 * 256.0));
+  float greenColor = floor((scaledColor - redColor * 256.0 * 256.0) / 256.0);
+  float blueColor = (scaledColor - greenColor * 256.0 - redColor * 256.0 * 256.0);
+  v_color = vec4(redColor / 255.0, greenColor / 255.0, blueColor / 255.0, 1);
+  v_normal = vec3(u_mvp * vec4(a_normal, 0));
+  gl_Position = u_mvp * u_effect * vec4(a_position, 1.0);
+}
+
+
+/** shader_fragment_annotate **/
+#ifdef GL_ES
+precision mediump float;
+#endif
+
+uniform vec4 u_color;
+
+void main() {
+  gl_FragColor = u_color;
+}
+
+/** shader_vertex_annotate **/
+
+uniform mat4 u_mvp;
+attribute vec3 a_position;
+
+void main() {
+  gl_Position = u_mvp * vec4(a_position, 1.0);
+}
+
+/** shader_fragment_rect **/
+#ifdef GL_ES
+precision mediump float;
+#endif
+
+uniform sampler2D u_texture;
+uniform vec4 u_color;
+varying vec2 v_texcoord;
+
+void main() {
+  vec4 fetch = texture2D(u_texture, v_texcoord);
+  gl_FragColor = u_color * fetch;
+}
+
+/** shader_vertex_rect **/
+
+uniform mat4 u_mvp;
+attribute vec3 a_position;
+attribute vec2 a_texcoord;
+
+varying vec2 v_texcoord;
+
+void main() {
+  v_texcoord  = a_texcoord;
+  gl_Position = u_mvp * vec4(a_position, 1.0);
+}
+

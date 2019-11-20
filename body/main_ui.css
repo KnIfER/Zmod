@@ -1,0 +1,356 @@
+/*
+ * CSS styles for main UI components of open-3d-viewer
+ */
+body {
+    overflow: hidden;
+    /*   -webkit-user-select:none;
+      -moz-user-select:none; */
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    background-image: url("images/bg-body.gif");
+    background-size: cover;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+a {
+    color: #4677d8;
+}
+
+html {
+    -ms-touch-action: none; /* Direct all pointer events to JavaScript code. */
+}
+
+/* Tweaks to jQuery theme */
+.ui-widget {
+    font-family: arial;
+    font-size: 10pt;
+}
+
+.ui-autocomplete {
+    max-height: 200px;
+    overflow-y: hidden;
+    /* prevent horizontal scrollbar */
+    overflow-x: hidden;
+    /* add padding to account for vertical scrollbar */
+    padding-right: 20px;
+}
+
+.outer_label {
+    position: absolute;
+}
+
+.wiki {
+    position: absolute;
+    top: 22px;
+    width: 300px;
+    padding: 4px;
+
+    background-color: rgba(255, 255, 255, 1.0);
+    border: 1px solid #333;
+    border-radius: 3px;
+    -webkit-user-select: all;
+    -moz-user-select: all;
+    -ms-user-select: all;
+}
+
+.label_select, .label_select_expandable, .label_pin, .label_pin_expandable, .label_hide {
+    position: absolute;
+    border-radius: 3px;
+    white-space: nowrap;
+    font-family: arial, sans-serif;
+    font-size: 12px;
+    text-align: center;
+    background-repeat: no-repeat;
+}
+
+.label_select {
+    padding: 3px 74px 3px 18px;
+    background-image: url('img/label_hide_pin_close.png'), url('img/label_info.png');
+    background-position: right top 4px, left top 4px;
+    background-color: #fff;
+    border: 1px solid #333;
+    color: #333;
+    z-index: 5;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+
+}
+
+.label_select_expandable {
+    padding: 3px 37px 3px 21px;
+    background-image: url('img/label_expand.png'), url('img/label_pin_and_close.png');
+    background-position: left center, right top 4px;
+    background-color: #fff;
+    border: 1px solid #333;
+    color: #333;
+    z-index: 5;
+}
+
+.label_pin {
+    padding: 3px 37px 3px 15px;
+    font-weight: bold;
+    background-image: url('img/label_pin_and_close.png'), url('img/label_info.png');
+    background-position: right top 4px, left top 4px;
+    background-color: #C2D6EB;
+    border: 1px solid #000;
+    color: #000;
+    z-index: 4;
+}
+
+.label_pin_expandable {
+    padding: 3px 21px 3px 21px;
+    font-weight: bold;
+    background-image: url('img/label_expand.png'), url('img/label_close.png');
+    background-position: left center, right top 4px;
+    background-color: #C2D6EB;
+    border: 1px solid #000;
+    color: #000;
+    z-index: 4;
+}
+
+.help-hidden {
+    border-radius: 0 0 17px 17px;
+    left: 17px;
+    position: absolute;
+    top: -568px;
+    display: block;
+    z-index: 1;
+}
+
+.ui-dialog textarea {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: transparent;
+
+}
+
+.ui-dialog textarea {
+    resize: none;
+}
+
+.annotation {
+    background: #d0d0d0;
+}
+
+.ui-dialog-titlebar-buttonpane {
+    background: #d0d0d0;
+}
+
+.ui-dialog-titlebar {
+    background: transparent;
+}
+
+.ui-dialog .ui-state-default {
+    background: url("images/ui-bg_glass_75_e6e6e6_1x400.png") repeat-x scroll 50% 50% transparent;
+}
+
+.no-titlebar .ui-dialog-titlebar {
+    display: none;
+}
+
+.ui-icon-triangle-1-s {
+    background-color: transparent;
+}
+
+.correct {
+    color: green;
+}
+
+.wrong {
+    color: red;
+}
+
+.loading-feedback {
+    background-color: #fff;
+    position: fixed;
+    left: 50%;
+    margin: -120px;
+    width: 240px;
+    top: 50%;
+    font-family: arial;
+    font-size: 12px;
+    border: 1px solid #6799CC;
+    border-radius: 7px 7px 7px 7px;
+    text-align: left;
+    padding: 7px 15px 15px 15px;
+    z-index: 50;
+    display: block;
+}
+
+.loading-feedback label {
+    display: block;
+    font-size: 10px;
+    color: #999;
+    margin-bottom: 5px;
+}
+
+.loading-feedback div {
+    border: 1px solid #DFDFDF;
+    background-color: #F2F2F2;
+    width: 240px;
+    height: 8px;
+    position: relative
+}
+
+.loading-feedback div span {
+    height: 10px;
+    background-color: #6799CC;
+    position: absolute;
+    top: -1px;
+    left: -1px;
+}
+
+.indicator {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #000;
+    z-index: 1000;
+    border-radius: 5px 5px 5px 5px;
+    left: -100px;
+    top: -100px;
+}
+
+.attrib_zy {
+    position: absolute;
+    background-color: #F0F0F0;
+    top: 100%;
+    z-index: 5;
+    width: 100%;
+    height: 36px;
+    margin: -36px 0 0 0;
+    font-size: 11px;
+    padding-top: 7px;
+    /*  color:#91ABC9; */
+    border-top: 1px solid #DFDFDF;
+}
+
+.attrib_zy a {
+    text-decoration: none;
+    color: #91ABC9;
+}
+
+.attrib_zy span {
+    /* color: #666; */
+}
+
+.attrib_zy img {
+    vertical-align: middle;
+}
+
+#footer-left {
+    float: left;
+    margin: 0 0 0 16px;
+}
+
+#footer-right {
+    float: right;
+    margin: 3px 12px 0 0;
+    color: #ACACAC;
+}
+
+.pop {
+    display: none;
+}
+
+.validationmsg {
+    color: red;
+}
+
+#sharethis {
+    color: black;
+    font-weight: bold;
+    float: right;
+}
+
+#copyright {
+    position: absolute;
+    top: 100%;
+    left: 100%;
+    margin: -56px 0 0 -327px;
+    font-size: 11px;
+    color: #999;
+}
+
+#bg-contact p {
+    margin: 5px 0 5px 0;
+}
+
+.ui-accordion .ui-accordion-content {
+    padding: 2px 4px;
+    border-top: 0;
+    overflow: auto;
+    zoom: 1;
+    max-height: 185px;
+}
+
+#footer-right img {
+    margin-top: -5px;
+}
+
+.videoicon {
+    background-image: url(images/icon-video.png);
+    background-position: center;
+}
+
+.ui-button {
+    margin-right: 0px;
+}
+
+.ui-button .ui-icon-zgvideo {
+    background-image: url(images/icon-video.png);
+    width: 18;
+    height: 18;
+}
+
+.ui-button.ui-state-hover .ui-icon-zgvideo {
+    background-image: url(images/icon-video.png);
+    width: 18;
+    height: 18;
+}
+
+.ui-buttonset {
+    margin-right: 0px;
+}
+
+.icon-example {
+    background-position: 0 0;
+}
+
+.icon-undo {
+    background-position: -16px 0;
+}
+
+.ui-state-default .ui-icon.custom {
+    background-image: url(images/icons.png);
+}
+
+.login-msg {
+    color: #FF0000;
+}
+
+.pop {
+    z-index: 10000000;
+}
+
+.zgsubmenu {
+    width: 120px;
+}
+
+.ui-icon.red {
+    background-image: url(scripts/libs/jqueryui/1.9.2/themes/base/images/ui-icons_cd0a0a_256x240.png);
+}
+
+.ui-icon.green {
+    background-image: url(scripts/libs/jqueryui/1.9.2/themes/base/images/ui-icons_1ab62c_256x240.png);
+}
