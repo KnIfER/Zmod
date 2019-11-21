@@ -1,5 +1,16 @@
 o3v.MODELS = [
         {
+            id: 'cow_anatomy:131011',
+            name: 'cow_anatomy.obj',
+            label: 'Cow',
+            scriptFile: 'models/cow_anatomy2/cow_anatomy.js',
+            metadataFile: 'models/cow_anatomy2/entity_metadata.json',
+            layerIconsFile: 'models/cow_anatomy2/layer_icons.png',
+            modelUri: '',
+            textureUri: '',
+            numLayers: 5
+        },
+        {
             id: 'adult_female:131011',
             name: 'adult_female.obj',
             label: 'Adult Female',

@@ -1,3 +1,4 @@
+
 function getHttpRequest(t, e, i) {
     var o = createCORSRequest("GET", t);
     o.onload = function (t) {
@@ -948,6 +949,16 @@ o3v.EntityModel.prototype.computeLayers_ = function (t) {
         o3v.util.isEmpty(t.layers) || (t.layers = Object.keys(t.layers))
     })
 },
+/**
+ * Computes layer information on all entities. Leaf entities are analogous
+ * to render groups, and must be in exactly one layer. All other entities are
+ * considered to be in every layer in which one of their children is. Thus,
+ * the root entity is in every layer, and 'elbow' may be in 'muscle' and
+ * 'skeleton' layers.
+ * This sets this.searchMatcher_ and this.searchToEntityIds_.
+ * @param {o3v.EntityMetadata} metadata Metadata.
+ * @private
+ */
 o3v.EntityModel.prototype.computeSearches_ = function (t) {
     var e = t.getSymmetries();
     for (var i in this.entities_) if (i = +i, !this.nonSearchableEntityIds_[i]) {
@@ -1010,9 +1021,13 @@ o3v.EntityModel.prototype.layerNameToId = function (t) {
     return this.layerNameToId_[t]
 },
 o3v.EntityModel.prototype.searchToEntityIds = function (t) {
+    console.log("hey searchToEntityIds");
+    console.log(t);
+    console.log(this.searchToEntityIds_[t]);
     return this.searchToEntityIds_[t]
 },
 o3v.EntityModel.prototype.getAutocompleteList = function () {
+    //console.log("hey auto completing???");
     return zg.account.isLiteUser() ? this.autocompleteList_.filter(function (t) {
         return "clothes" != t && "shorts" != t && "female skin" != t && "skin" != t && "m_skin" != t && "male skin" != t
     }) : this.autocompleteList_
@@ -1273,6 +1288,8 @@ o3v.LayersUI.SingleSlider = function (t) {
     this.HANDLE_WIDTH = 51
 },
 o3v.LayersUI.SingleSlider.prototype.build = function (t, e) {
+    console.log("hey here is a t!!!");
+    console.log(t);
     this.numLayers = e,
     this.slider && this.slider.remove(),
     this.slider = $("<div>").appendTo("body").slider({
@@ -1977,7 +1994,7 @@ o3v.Label.prototype.refresh = function () {
                     a.mouseDown = !1,
                     viewer_.inputHandler_.setCaptureHack=0
                 }),
-            //this.inputHandler_.registerHandler(o3v.InputHandler.CLICK, r, this.makeHandler_(e, r, t.type).bind(this), !0),
+            this.inputHandler_.registerHandler(o3v.InputHandler.CLICK, r, this.makeHandler_(e, r, t.type).bind(this), !0),
             this.currentLabels_[e] = {
                     type: t.type,
                     dom: h,
@@ -2104,23 +2121,9 @@ o3v.navUI = function (t, e, i) {
         height: "20px",
         "z-index": o3v.uiSettings.ZINDEX_MAINUI
     };
- 
-    this.screenShot = $("<div>").appendTo("body").css(o).css({
-        left: "49.3%",
-        top: "1px",
-        display: "none"
-    }).button({
-        icons: {
-            primary: "ui-icon-image"
-        },
-        text: !1
-    }).click(function () {
-        if (void 0 == account || "professional" != account.account_type) return void alert("'This feature requires a professional subscription.'");
-        new zg.Paint
-    }.bind(this)),
     this.navHome = $("<div>").appendTo("body").css(o).css({
         left: "32px",
-        top: "64px"
+        top: (isMobile?(32-md):64)+"px"
     }).button({
         icons: {
             primary: "ui-icon-home"
@@ -2130,7 +2133,7 @@ o3v.navUI = function (t, e, i) {
         this.reset_()
     }.bind(this));
     var n = this.navHome.get(0);
-    //if(false)
+    if(!isMobile)
     this.navUp = $("<div>").appendTo("body").css(o).button({
         icons: {
             primary: "ui-icon-triangle-1-n"
@@ -2146,6 +2149,23 @@ o3v.navUI = function (t, e, i) {
     }.bind(this)).mouseup(function () {
         this.move_(0, 0)
     }.bind(this)),
+    this.navDown = $("<div>").appendTo("body").css(o).button({
+        icons: {
+            primary: "ui-icon-triangle-1-s"
+        },
+        text: !1
+    }).position({
+        my: "top",
+        at: "bottom",
+        of: n,
+        collision: "none"
+    }).mousedown(function () {
+        this.move_(0, o3v.navUI.MOVE_FACTOR)
+    }.bind(this)).mouseup(function () {
+        this.move_(0, 0)
+    }.bind(this));
+    
+    
     this.navLeft = $("<div>").appendTo("body").css(o).button({
         icons: {
             primary: "ui-icon-triangle-1-w"
@@ -2175,22 +2195,8 @@ o3v.navUI = function (t, e, i) {
         this.move_(o3v.navUI.MOVE_FACTOR, 0)
     }.bind(this)).mouseup(function () {
         this.move_(0, 0)
-    }.bind(this)),
-    this.navDown = $("<div>").appendTo("body").css(o).button({
-        icons: {
-            primary: "ui-icon-triangle-1-s"
-        },
-        text: !1
-    }).position({
-        my: "top",
-        at: "bottom",
-        of: n,
-        collision: "none"
-    }).mousedown(function () {
-        this.move_(0, o3v.navUI.MOVE_FACTOR)
-    }.bind(this)).mouseup(function () {
-        this.move_(0, 0)
-    }.bind(this)),
+    }.bind(this));
+    
     this.navZoomIn = $("<div>").appendTo("body").css(o).button({
         icons: {
             primary: "ui-icon-plus"
@@ -2199,31 +2205,34 @@ o3v.navUI = function (t, e, i) {
     }).position({
         my: "top",
         at: "bottom",
-        of: this.navDown.get(0),
-        offset: "10 7",
+        of: (isMobile?this.navHome:this.navDown).get(0),
+        offset: "-15 3",
         collision: "none"
     }).mousedown(function () {
         this.zoom_(0, o3v.navUI.ZOOM_FACTOR)
     }.bind(this)).mouseup(function () {
         this.zoom_(0, 0)
     }.bind(this)),
+    
     this.navZoomOut = $("<div>").appendTo("body").css(o).button({
         icons: {
             primary: "ui-icon-minus"
         },
         text: !1
     }).position({
-        my: "right",
-        at: "left",
-        of: this.navZoomIn.get(0),
+        my: "top",
+        at: "bottom",
+        of: (isMobile?this.navHome:this.navDown).get(0),
+        offset: "15 3",
         collision: "none"
     }).mousedown(function () {
         this.zoom_(0, -o3v.navUI.ZOOM_FACTOR)
     }.bind(this)).mouseup(function () {
         this.zoom_(0, 0)
-    }.bind(this)),
+    }.bind(this));
+    
     this.navReset0 = zg.PushButton({
-        label: "Unhide All"
+        label: "ShowAll"
     }, {
         right: "155px",
         top: "58px",
@@ -2250,327 +2259,37 @@ o3v.navUI = function (t, e, i) {
     }, function () {
         window.open("http://www.youtube.com/watch?v=M5TysvPJMVo", "_blank")
     }.bind(this)),
-    this.navMode = zg.RadioButtons([{
-        label: "Capsule",
-        css: {
-            width: "62px"
-        }
-    },
-    {
-        label: "Orbit",
-        css: {
-            width: "48px"
-        }
-    }], {}, {}, function (t) {
-        var e = $(this).find(".ui-state-active").attr("id"),
-            i = e.length > 0 && "1" == e[e.length - 1];
-        if (0 != i && (void 0 == account || void 0 == account.account_type || "lite" == account.account_type)) return viewer_.navUI_.didWarn || alert("A paid subscription is required to use this feature."),
-        viewer_.navUI_.didWarn = !0,
-        void setTimeout(function () {
-                viewer_.navUI_.pressFirstRadio(viewer_.navUI_.navMode)
-            }, 100);
-        viewer_.navigator_.setOrbitMode(i),
-        0 == i && viewer_.navigator_.resetNavParameters()
-    }),
-    this.navMode.css({
+    
+    this.navMode = zg.PushButton({
+        label: "Tools"
+    }, {
         position: "absolute",
         right: "38px",
         width: "117px",
         top: "58px"
-    }),
-    this.navPresets = null,
-    this.rightPane = new zg.Accordion,
-    this.SECTION_SAVES = this.rightPane.sections.length,
-    this.rightPane.AddSection("My Scenes", "http://www.youtube.com/watch?v=1WeKJcTPM50"),
-    this.SECTION_PRESETS = this.rightPane.sections.length,
-    this.rightPane.AddSection("Zygote Scenes", "http://www.youtube.com/watch?v=1WeKJcTPM50"),
-    this.SECTION_HIERARCHY = this.rightPane.sections.length,
-    this.rightPane.AddSection("Hierarchy", "http://www.youtube.com/watch?v=EV0sUi01qKs"),
-    this.SECTION_ANNOTATIONS = this.rightPane.sections.length,
-    this.rightPane.AddSection("Annotations", "http://www.youtube.com/watch?v=KmscL8oH11Y"),
-    this.SECTION_TOOLS = this.rightPane.sections.length,
-    this.rightPane.AddSection("Tools", "http://www.youtube.com/watch?v=nREdqCM8RXs"),
-    this.rightPane.Create("body", {
-        right: "16px",
-        top: "89px",
-        width: "218px"
-    }),
-    
+    }, function (jev) {
+        //tg
+        console.log("hey tools!!!");
+        //console.log(window.viewer_.contentManager_.metadata_.autocompleteList_);
+        //console.log(o3v.MODELS);
+        var t="ventricles";
+        var this_=window.viewer_;
+        if (this_.loadedMetadata_ && this_.loadedModel_) {
+            var e = this_.contentManager_.getMetadata().searchToEntityIds(t);
+            console.log(e);
+            if (this_.select_.selectMultiple(e), this_.select_.haveSelected()) {
+                this_.opacity_.exposeSelected();
+                var i = this_.navigator_.focusOnEntities(this_.select_.getSelected());
+                this_.navigator_.goToBBox(i)
+            } else this_.navigator_.resetNavParameters()
+        }
+        
+    }.bind(this)),
     
     this.freeRide = [], 
     this.paidFor = [],
-    this.heirachy = $('<div id="demo1"></div>').appendTo("#" + this.rightPane.sections[this.SECTION_HIERARCHY].divId),
-    this.paidFor.push(this.heirachy),
-    this.annotateBtn = zg.PushButton({
-        label: "Create"
-    }, {
-        width: "53%"
-    }, function () {
-        var t = (viewer_.annotator.create(), this.annotateMode.attr("id")),
-            e = "l" + t + "item1";
-        document.getElementById(e).click()
-    }.bind(this), "#" + this.rightPane.sections[this.SECTION_ANNOTATIONS].divId),
-    this.paidFor.push(this.annotateBtn),
-    this.annotateDeleteBtn = zg.PushButton({
-        label: "Erase All"
-    }, {
-        width: "43%"
-    }, function () {
-        confirm("Delete all annotations?") && viewer_.annotator.deleteAll()
-    }.bind(this), "#" + this.rightPane.sections[this.SECTION_ANNOTATIONS].divId),
-    this.paidFor.push(this.annotateDeleteBtn),
-    this.annotateMode = zg.RadioButtons([{
-        label: "Lock"
-    },
-    {
-        label: "Move"
-    }], {}, {
-        width: "54%"
-    }, function (t) {
-        var e = $(this).find(".ui-state-active").attr("id"),
-            i = e.length > 0 && "1" == e[e.length - 1];
-        viewer_.annotator.setLock(!i)
-    }, "#" + this.rightPane.sections[this.SECTION_ANNOTATIONS].divId),
-    this.paidFor.push(this.annotateMode),
-    this.toolMode = zg.RadioButtons([{
-        label: "Pick",
-        css: {
-            width: "23%"
-        }
-    },
-    {
-        label: "Slice",
-        css: {
-            width: "24%"
-        }
-    },
-    {
-        label: "Explode",
-        css: {
-            width: "31%"
-        }
-    },
-    {
-        label: "Quiz",
-        css: {
-            width: "22%"
-        }
-    }], {}, {
-        width: "97%"
-    }, function (t) {
-        var e = $(this.toolMode).find(".ui-state-active").attr("id"),
-            i = e[e.length - 1] - "0";
-        switch (this.sliderLabel.hide(), this.slider.hide(), this.sliceXMode.hide(), this.sliceYMode.hide(), this.sliceZMode.hide(), i) {
-            case 0:
-                viewer_.toolMode = 1;
-                break;
-            case 1:
-                viewer_.toolMode = 2,
-                this.sliceXMode.show(),
-                this.sliceYMode.show(),
-                this.sliceZMode.show();
-                break;
-            case 2:
-                viewer_.toolMode = 3,
-                this.sliderLabel.show(),
-                this.slider.show();
-                break;
-            case 3:
-                viewer_.toolMode = 4
-            }
-        viewer_.changeCallback()
-    }.bind(this), "#" + this.rightPane.sections[this.SECTION_TOOLS].divId),
-    this.paidFor.push(this.toolMode),
-    $("<br><br>").appendTo("#" + this.rightPane.sections[this.SECTION_TOOLS].divId),
-    this.sliderLabel = zg.Label({
-        label: "Strength"
-    }, {
-        width: "90%",
-        "text-align": "center",
-        margin: "0px auto 5px",
-        display: "block"
-    }, function (t, e) {}, "#" + this.rightPane.sections[this.SECTION_TOOLS].divId),
-    this.paidFor.push(this.sliderLabel),
-    this.slider = zg.Slider({
-        label: "Create"
-    }, {
-        width: "90%",
-        "margin-left": "auto",
-        "margin-right": "auto",
-        display: "none"
-    }, function (t, e) {
-        viewer_.explodeRange = e.value,
-        viewer_.changeCallback()
-    }, "#" + this.rightPane.sections[this.SECTION_TOOLS].divId),
-    this.sliderLabel.hide(),
-    this.slider.hide(),
-    this.paidFor.push(this.slider),
-    this.sliceXMode = zg.RadioButtons([{
-        label: "Off",
-        css: {
-            width: "20%"
-        }
-    },
-    {
-        label: "Right",
-        css: {
-            width: "30%"
-        }
-    },
-    {
-        label: "Left",
-        css: {
-            width: "30%"
-        }
-    }], {}, {
-        width: "97%"
-    }, function (t) {
-        var e = $(this.sliceXMode).find(".ui-state-active").attr("id"),
-            i = e[e.length - 1] - "0";
-        viewer_.sliceX = -1 * (2 != i ? i : -1),
-        viewer_.changeCallback()
-    }.bind(this), "#" + this.rightPane.sections[this.SECTION_TOOLS].divId),
-    $("<br>").appendTo("#" + this.rightPane.sections[this.SECTION_TOOLS].divId),
-    this.sliceYMode = zg.RadioButtons([{
-        label: "Off",
-        css: {
-            width: "20%"
-        }
-    },
-    {
-        label: "Bottom",
-        css: {
-            width: "30%"
-        }
-    },
-    {
-        label: "Top",
-        css: {
-            width: "30%"
-        }
-    }], {}, {
-        width: "97%"
-    }, function (t) {
-        var e = $(this.sliceYMode).find(".ui-state-active").attr("id"),
-            i = e[e.length - 1] - "0";
-        viewer_.sliceY = -1 * (2 != i ? i : -1),
-        viewer_.changeCallback()
-    }.bind(this), "#" + this.rightPane.sections[this.SECTION_TOOLS].divId),
-    $("<br>").appendTo("#" + this.rightPane.sections[this.SECTION_TOOLS].divId),
-    this.sliceZMode = zg.RadioButtons([{
-        label: "Off",
-        css: {
-            width: "20%"
-        }
-    },
-    {
-        label: "Back",
-        css: {
-            width: "30%"
-        }
-    },
-    {
-        label: "Front",
-        css: {
-            width: "30%"
-        }
-    }], {}, {
-        width: "97%"
-    }, function (t) {
-        var e = $(this.sliceZMode).find(".ui-state-active").attr("id"),
-            i = e[e.length - 1] - "0";
-        viewer_.sliceZ = -1 * (2 != i ? i : -1),
-        viewer_.changeCallback()
-    }.bind(this), "#" + this.rightPane.sections[this.SECTION_TOOLS].divId),
-    $("<br>").appendTo("#" + this.rightPane.sections[this.SECTION_TOOLS].divId),
-    this.sliceXMode.hide(),
-    this.sliceYMode.hide(),
-    this.sliceZMode.hide(),
-    this.fileSaveBtn = zg.PushButton({
-        label: "Save"
-    }, {
-        width: "29%",
-        float: "right"
-    }, function () {
-        var t = prompt("Name?");
-        if (t && (-1 == this.fileNames_.indexOf(t) || confirm("File by that name already exists. \nSave over existing " + t + "?"))) {
-            var e = "/scenes/" + t + ".json";
-            zg.save(e, this.folderUpdate.bind(this))
-        }
-    }.bind(this), "#" + this.rightPane.sections[this.SECTION_SAVES].divId),
-    this.paidFor.push(this.fileSaveBtn),
-    this.fileResetBtn = zg.PushButton({
-        label: "Reset"
-    }, {
-        width: "29%"
-    }, function () {
-        if (confirm("Reset Scene?")) {
-            viewer_.annotator.deleteAll(),
-            this.reset_(),
-            viewer_.select_.clearSelection(),
-            viewer_.select_.clearPinned(!0);
-            var t = viewer_.contentManager_.metadata_;
-            viewer_.opacity_.reset(t),
-            viewer_.layersUI_.restoreState("1,1,10000"),
-            viewer_.navUI_.resetTools(),
-            viewer_.resetTools();
-            for (var e = t.layerNames_, i = 0; i < e.length; i++) {
-                var o = e[i],
-                    n = t.layerNameToId_[o];
-                o3v.recurseHide(n, !1)
-            }
-            this.heirachyUI()
-        }
-    }.bind(this), "#" + this.rightPane.sections[this.SECTION_SAVES].divId),
-    this.paidFor.push(this.fileResetBtn),
-    $("<div></div>").appendTo("#" + this.rightPane.sections[this.SECTION_SAVES].divId).css({
-        clear: "both"
-    }),
-    this.fileSelection = [],
-    this.fileList = zg.List([], {
-        width: "100%"
-    }, null, "#" + this.rightPane.sections[this.SECTION_SAVES].divId),
-    this.fileList.on("selectableselected", function (t, e) {
-        if (!this.blockLoad) {
-            this.blockLoad = !0,
-            setTimeout(function () {
-                this.blockLoad = !1
-            }.bind(this), 1e3);
-            var i = e.selected,
-                o = zg.extractName(i.innerHTML),
-                n = "/scenes/" + o + ".json";
-            setTimeout(function () {
-                    confirm("Load " + o + "?") && (viewer_.navUI_.resetTools(), viewer_.resetTools(), zg.load(n)),
-                    $("#" + viewer_.navUI_.fileList[0].id + " .ui-selected").removeClass("ui-selected")
-                }, 100)
-        }
-    }.bind(this)),
-    this.paidFor.push(this.fileList),
-    $("<div></div>").appendTo("#" + this.rightPane.sections[this.SECTION_SAVES].divId).css({
-        height: "8px"
-    }),
-    this.zygoteList = zg.List([], {
-        width: "100%"
-    }, null, "#" + this.rightPane.sections[this.SECTION_PRESETS].divId),
-    this.zygoteList.on("selectableselected", function (t, e) {
-        if (!this.blockLoad) {
-            this.blockLoad = !0,
-            setTimeout(function () {
-                this.blockLoad = !1
-            }.bind(this), 1e3);
-            var i = e.selected,
-                o = zg.extractName(i.innerHTML),
-                n = "/zygote_scenes/" + o + ".json";
-            setTimeout(function () {
-                    confirm("Load " + o + "?") && (viewer_.navUI_.resetTools(), viewer_.resetTools(), zg.load(n)),
-                    $("#" + viewer_.navUI_.zygoteList[0].id + " .ui-selected").removeClass("ui-selected")
-                }, 100)
-        }
-    }.bind(this)),
-    $("<div></div>").appendTo("#" + this.rightPane.sections[this.SECTION_PRESETS].divId).css({
-        height: "8px"
-    }),
-    this.paidFor.push(this.zygoteList),
+ 
+  
     this.refresh(),
     this.created = !0
 },
@@ -2596,17 +2315,6 @@ zg.extractName = function (t) {
     t
 },
 o3v.navUI.prototype.refresh = function () {
-    if (void 0 == account || void 0 == account.account_type || "lite" == account.account_type) {
-        this.created && this.resetTools(),
-        this.sliceXMode.hide(),
-        this.sliceYMode.hide(),
-        this.sliceZMode.hide();
-        for (var t = 0; t < this.freeRide.length; t++) this.freeRide[t].show();
-        for (var t = 0; t < this.paidFor.length; t++) this.paidFor[t].hide()
-    } else {
-        for (var t = 0; t < this.freeRide.length; t++) this.freeRide[t].hide();
-        for (var t = 0; t < this.paidFor.length; t++) this.paidFor[t].show()
-    }
     this.folderUpdate(),
     this.heirachyUI()
 },
@@ -2829,7 +2537,7 @@ o3v.Navigator = function (t, e, i) {
     this.verticalAdjustment = 100,
     this.vertMaxLimit = {},
     this.vertMinLimit = {},
-    this.zoomNearLimit = -10,
+    this.zoomNearLimit = 0.1,
     this.zoomFarLimit = 300,
     this.startPan = .1,
     this.center = [0, 0, 0],
@@ -2942,7 +2650,7 @@ o3v.Navigator.prototype.getState = function () {
 o3v.Navigator.prototype.restoreState = function (t) {
     if (t) {
         var e = t.split(",");
-        0 != parseFloat(e[3]) || 0 != parseFloat(e[4]) || 0 != parseFloat(e[5]) || 0 != parseFloat(e[6]) ? (viewer_.navUI_.pressRadio(viewer_.navUI_.navMode, 1), this.doOrbit = !0) : (viewer_.navUI_.pressRadio(viewer_.navUI_.navMode, 0), this.doOrbit = !1),
+        0 != parseFloat(e[3]) || 0 != parseFloat(e[4]) || 0 != parseFloat(e[5]) || 0 != parseFloat(e[6]) ? (/*viewer_.navUI_.pressRadio(viewer_.navUI_.navMode, 1),*/ this.doOrbit = !0) : (/*viewer_.navUI_.pressRadio(viewer_.navUI_.navMode, 0),*/ this.doOrbit = !1),
         this.doNavigate2(parseFloat(e[0]), parseFloat(e[1]), parseFloat(e[2]), parseFloat(e[3]), parseFloat(e[4]), parseFloat(e[5]), parseFloat(e[6]), !1)
     } else this.reset(!1)
 },
@@ -3122,6 +2830,48 @@ o3v.Navigator.prototype.doNavigate2 = function (t, e, i, o, n, s, a, r, h) {
     this.state_ = [Math.round(100 * t) / 100, Math.round(100 * e) / 100, Math.round(100 * i) / 100, Math.round(100 * o) / 100, Math.round(100 * n) / 100, Math.round(100 * s) / 100, Math.round(100 * a) / 100].join(","),
     r && this.history.update()
 },
+// Navigates to a location.
+// This function is ultimately always called if we change something so we call
+// recalculate and tell the renderer to update
+o3v.Navigator.prototype.doNavigate3 = function(angle, y, zoom, addToHistory,
+                                              opt_camera_scale) {
+  this.theta.setFuture(angle);
+
+  var camera_scale = (opt_camera_scale) ? opt_camera_scale : 1;
+
+  var verticalLowerLimit = (this.vertMinLimit.getFuture() -
+                            this.verticalAdjustment);
+  var verticalUpperLimit = (this.vertMaxLimit.getFuture() +
+                            this.verticalAdjustment);
+
+  if (y < verticalLowerLimit) {
+    y = verticalLowerLimit;
+  }
+  if (y > verticalUpperLimit) {
+    y = verticalUpperLimit;
+  }
+  this.dolly.y.setFuture(y);
+
+  if (zoom < this.zoomNearLimit) {
+    zoom = this.zoomNearLimit;
+  }
+  if (zoom > this.zoomFarLimit) {
+    zoom = this.zoomFarLimit;
+  }
+  this.dolly.z.setFuture(zoom);
+
+  this.changeCallback_();
+
+  // Set up with history.
+  this.state_ = [Math.round(angle * 100) / 100,
+                 Math.round(y * 100) / 100,
+                 Math.round(zoom * 100) / 100].join(',');
+  if (addToHistory) {
+    this.history.update();
+  }
+};
+
+//处理缩放事件
 o3v.Navigator.prototype.doNavigateDelta = function (t, e, i, o, n, s, a) {
     var r = this.dolly.z.getPresent() / 80,
         h = this.theta.getPresent();
@@ -3179,10 +2929,12 @@ o3v.InputHandler = function (t) {
     t.addEventListener("pointermove", this.handlePointerMove.bind(this)),
     t.addEventListener("pointerout", this.handlePointerOut.bind(this)),
     document.addEventListener("gesturestart", function (t) {
-        t.preventDefault()
+        if(t.cancelable)
+            t.preventDefault()
     }),
     document.body.addEventListener("touchmove", function (t) {
-        t.preventDefault()
+        if(t.cancelable)
+            t.preventDefault()
     }, {
         passive: !1
     }),
@@ -3291,20 +3043,23 @@ o3v.InputHandler.prototype.handlePointerDown = function (t) {
 o3v.InputHandler.prototype.calcDistance = function (t, e, i, o) {
     return Math.sqrt((t - i) * (t - i) + (e - o) * (e - o))
 },
+//触摸缩放
 o3v.InputHandler.prototype.handlePointerMove = function (t) {
-    if ("viewer" != t.target.id) return !0;
-    for (var e in this.currentPointers) this.currentPointers.hasOwnProperty(e) && e == t.pointerId && (this.currentPointers[e][2] = t.pageX, this.currentPointers[e][3] = t.pageY);
-    var i = [];
-    for (var e in this.currentPointers) this.currentPointers.hasOwnProperty(e) && i.push(this.currentPointers[e]);
-    if (i.length < 2) delete this.lastDistance;
-    else if (i.length >= 2) {
-        this.lastDistance || (this.lastDistance = this.calcDistance(i[0][0], i[0][1], i[1][0], i[1][1]));
-        var o = this.calcDistance(i[0][2], i[0][3], i[1][2], i[1][3]),
-            n = o - this.lastDistance;
-        n *= 20,
-        this.delegate(o3v.InputHandler.SCROLL, t.target, [0, n, i[0][2], i[0][3]]),
-        this.lastDistance = o
-    }
+    //if ("viewer" != t.target.id) return !0;
+    //for (var e in this.currentPointers) 
+    //    this.currentPointers.hasOwnProperty(e) && e == t.pointerId && (this.currentPointers[e][2] = t.pageX, this.currentPointers[e][3] = t.pageY);
+    //var i = [];
+    //for (var e in this.currentPointers)
+    //    this.currentPointers.hasOwnProperty(e) && i.push(this.currentPointers[e]);
+    //if (i.length < 2) delete this.lastDistance;
+    //if (i.length >= 2) {
+    //    this.lastDistance || (this.lastDistance = this.calcDistance(i[0][0], i[0][1], i[1][0], i[1][1]));
+    //    var o = this.calcDistance(i[0][2], i[0][3], i[1][2], i[1][3]),
+    //        n = o - this.lastDistance;
+    //    n *= 20,
+    //    this.delegate(o3v.InputHandler.SCROLL, t.target, [0, n, i[0][2], i[0][3]]),
+    //    this.lastDistance = o
+    //}
     return !0
 },
 o3v.InputHandler.prototype.handlePointerUp = function (t) {
@@ -3323,9 +3078,11 @@ o3v.InputHandler.prototype.handlePointerOut = function (t) {
     return e.length < 2 && delete this.lastDistance,
     !0
 },
+//触摸开始
 o3v.InputHandler.prototype.handleTouchStart = function (t) {
     if ("viewer" == t.target.id) {
-        t.preventDefault();
+        if(t.cancelable)
+            t.preventDefault();
         for (var e = void 0 !== t.changedTouches ? t.changedTouches : [t], i = 0; i < e.length; i++) this.ongoingTouches.push(this.copyTouch(e[i])),
         this.startingTouches.push(this.copyTouch(e[i]));
         this.ongoingTouches.lenght > 1 && (this.singleTouch = !1)
@@ -3333,7 +3090,9 @@ o3v.InputHandler.prototype.handleTouchStart = function (t) {
 },
 o3v.InputHandler.prototype.handleTouchEnd = function (t) {
     if ("viewer" == t.target.id) {
-        t.preventDefault();
+        //console.log(t)
+        if(t.cancelable)
+            t.preventDefault();
         var e = void 0 !== t.changedTouches ? t.changedTouches : [t];
         this.singleTouch && this.delegate(o3v.InputHandler.CLICK, t.target, [e[0].pageX, e[0].pageY, {}]);
         for (var i = 0; i < e.length; i++) {
@@ -3351,9 +3110,11 @@ o3v.InputHandler.prototype.handleTouchCancel = function (t) {
 o3v.InputHandler.prototype.handleTouchLeave = function (t) {
     "viewer" == t.target.id && t.preventDefault()
 },
+//触摸
 o3v.InputHandler.prototype.handleTouchMove = function (t) {
     if ("viewer" == t.target.id) {
-        t.preventDefault();
+        if(t.cancelable)
+            t.preventDefault();
         var e = void 0 !== t.changedTouches ? t.changedTouches : [t];
         if (1 == e.length && 1 == this.ongoingTouches.length && 1 == this.startingTouches.length) {
             var i = this.ongoingTouchIndexById(e[0].identifier, 0),
@@ -3368,9 +3129,10 @@ o3v.InputHandler.prototype.handleTouchMove = function (t) {
                 c = s - l;
             this.lastMouseDownTarget_ = t.target,
             (0 != d || 0 != c) && (n - a) * (n - a) + (s - r) * (s - r) > 225 && (this.singleTouch = !1);
+            //if(false)
             this.delegate(o3v.InputHandler.DRAG, this.lastMouseDownTarget_, [d, c, n, s, {
                     modifiers: {}
-                }])
+                }]);
         }
         if (2 == this.ongoingTouches.length && 2 == this.startingTouches.length) {
             var u = 0,
@@ -3397,8 +3159,9 @@ o3v.InputHandler.prototype.handleTouchMove = function (t) {
                 c = 0;
             C > 1e-5 && (c = 20 * (x - S)),
             this.lastMouseDownTarget_ = t.target,
-            0 == d && 0 == c || (this.singleTouch = !1),
-            this.delegate(o3v.InputHandler.SCROLL, t.target, [d, c, g, y])
+            0 == d && 0 == c || (this.singleTouch = !1);
+            //if(false)
+            this.delegate(o3v.InputHandler.SCROLL, t.target, [d, c, g, y]);
         }
         for (var N = 0; N < e.length; N++) {
             var i = this.ongoingTouchIndexById(e[N].identifier, N);
@@ -3415,7 +3178,7 @@ o3v.InputHandler.prototype.handleMouseDown = function (t) {
 },
 o3v.InputHandler.prototype.handleMouseUp = function (t) {
     if (this.setCaptureHack) {
-        console.log("hey a forgotten sorrow!!!");
+        //console.log("hey a forgotten sorrow!!!");
         this.setCaptureHack.mouseup(t);
         this.setCaptureHack=0;
     }
@@ -3809,12 +3572,14 @@ o3v.MainUI = function (t) {
         this.navHandler(this.NAV_HOME)
     }),
     this.timeStamp = 0,
+    //加载模型按钮
     this.newModelBtn_ = $("<div>").appendTo("body").css({
         position: "absolute",
         left: "17px",
-        top: "148px",
+        top: (isMobile?(82-md):148)+"px",
         width: "45px",
         height: "62px",
+        display: isMobile?"none":"",
         "border-left": "2px solid #6799CC",
         "border-top-left-radius": "16px",
         "border-top-right-radius": "16px",
@@ -3865,7 +3630,7 @@ o3v.MainUI = function (t) {
     this.modelBtn_ = $("<div>").appendTo("body").css({
         position: "absolute",
         left: "17px",
-        top: "226px",
+        top: (isMobile?(85-md):226)+"px",/*226*/
         width: "45px",
         height: "10px",
         "border-left": "2px solid #6799CC",
