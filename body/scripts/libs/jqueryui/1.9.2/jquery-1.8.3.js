@@ -3290,7 +3290,7 @@ jQuery.Event.prototype = {
 		}
 
 		// if preventDefault exists run it on the original event
-		if ( e.preventDefault ) {
+		if ( e.preventDefault && e.cancelable) {
 			e.preventDefault();
 
 		// otherwise set the returnValue property of the original event to false (IE)

@@ -1021,9 +1021,9 @@ o3v.EntityModel.prototype.layerNameToId = function (t) {
     return this.layerNameToId_[t]
 },
 o3v.EntityModel.prototype.searchToEntityIds = function (t) {
-    console.log("hey searchToEntityIds");
-    console.log(t);
-    console.log(this.searchToEntityIds_[t]);
+    //console.log("hey searchToEntityIds");
+    //console.log(t);
+    //console.log(this.searchToEntityIds_[t]);
     return this.searchToEntityIds_[t]
 },
 o3v.EntityModel.prototype.getAutocompleteList = function () {
@@ -1957,25 +1957,39 @@ o3v.Label.prototype.refresh = function () {
                 h = s.get(0);
             h.style.left = Math.round(i[0] - h.offsetWidth / 2) + "px",
             h.style.top = Math.round(i[1] - h.offsetHeight / 2) + "px",
-            a.mousedown(function (t) {
-                    console.log("hey it's a lable got clicked!");
-                    console.log(a);
-                    r.setCapture ? r.setCapture() : viewer_.inputHandler_.setCaptureHack = a,
-                    a.mouseDown = !0,
-                    a.startMouseX = t.screenX,
-                    a.startMouseY = t.screenY,
+            downfunction=function (t) {
+                    //console.log("hey it's a label got clicked!"+r.setCapture);
+                    //console.log(t);
+                    //r.setCapture ? r.setCapture() 
+                    //: 
+                    viewer_.inputHandler_.setCaptureHack = a
+                    ,
+                    a.mouseDown = !0;
+                    var tmp=t.originalEvent.changedTouches;
+                    tmp=(tmp?tmp[0]:t);
+                    if(!tmp) tmp=t;
+                    a.startMouseX = tmp.screenX,
+                    a.startMouseY = tmp.screenY,
                     a.startX = parseInt(h.style.left.substring(0, h.style.left.length - 2)),
                     a.startY = parseInt(h.style.top.substring(0, h.style.top.length - 2))
-                }),
+                },
+            isMobile?
+            a.on('touchstart',downfunction)
+            :a.mousedown(downfunction)
+            ,
             a.hackMove = function (t) {
-                    if (a.mouseDown) {
-                        var e = t.screenX - a.startMouseX,
-                            i = t.screenY - a.startMouseY;
-                        a.x = e,
-                        a.y = i,
-                        h.style.left = Math.round(e + a.startX) + "px",
-                        h.style.top = Math.round(i + a.startY) + "px"
-                    }
+                if (a.mouseDown) {
+                    console.log("hey hackMove isMobile!!!");
+                    //console.log(t);
+                    var tmp=(t.touches?t.touches[0]:t);
+                    if(!tmp) tmp=t;
+                    var e = tmp.screenX - a.startMouseX,
+                        i = tmp.screenY - a.startMouseY;
+                    a.x = e,
+                    a.y = i,
+                    h.style.left = Math.round(e + a.startX) + "px",
+                    h.style.top = Math.round(i + a.startY) + "px";
+                }
             },
             //a.mousemove(function (t) {
             //        if (a.mouseDown) {
@@ -2919,11 +2933,11 @@ o3v.InputHandler = function (t) {
     t.addEventListener("wheel", this.handleScrollWheel.bind(this), !1),
     t.addEventListener("keydown", this.handleKeyDown.bind(this), !1),
     t.addEventListener("keyup", this.handleKeyUp.bind(this), !1),
-    t.addEventListener("touchstart", this.handleTouchStart.bind(this)),
-    t.addEventListener("touchend", this.handleTouchEnd.bind(this)),
-    t.addEventListener("touchcancel", this.handleTouchCancel.bind(this)),
-    t.addEventListener("touchleave", this.handleTouchLeave.bind(this)),
-    t.addEventListener("touchmove", this.handleTouchMove.bind(this)),
+    t.addEventListener("touchstart", this.handleTouchStart.bind(this), {passive: !1}),
+    t.addEventListener("touchend", this.handleTouchEnd.bind(this), {passive: !1}),
+    t.addEventListener("touchcancel", this.handleTouchCancel.bind(this), {passive: !1}),
+    t.addEventListener("touchleave", this.handleTouchLeave.bind(this), {passive: !1}),
+    t.addEventListener("touchmove", this.handleTouchMove.bind(this), {passive: !1}),
     t.addEventListener("pointerdown", this.handlePointerDown.bind(this)),
     t.addEventListener("pointerup", this.handlePointerUp.bind(this)),
     t.addEventListener("pointermove", this.handlePointerMove.bind(this)),
@@ -2933,10 +2947,10 @@ o3v.InputHandler = function (t) {
             t.preventDefault()
     }),
     document.body.addEventListener("touchmove", function (t) {
-        if(t.cancelable)
-            t.preventDefault()
+        //if(t.cancelable)
+       //     t.preventDefault()
     }, {
-        passive: !1
+       passive: !1
     }),
     this.ongoingTouches = [],
     this.startingTouches = [],
@@ -3112,10 +3126,18 @@ o3v.InputHandler.prototype.handleTouchLeave = function (t) {
 },
 //触摸
 o3v.InputHandler.prototype.handleTouchMove = function (t) {
-    if ("viewer" == t.target.id) {
+    console.log("hey handleTouchMove "+t.target.id);
+    if ("inner-label" == t.target.id) {
+        console.log("hey handleTouchMove hackMove");
+        if (this.setCaptureHack) {
+            this.setCaptureHack.hackMove(t);
+        }
+    }
+    else if ("viewer" == t.target.id) {
         if(t.cancelable)
             t.preventDefault();
         var e = void 0 !== t.changedTouches ? t.changedTouches : [t];
+        //单指旋转
         if (1 == e.length && 1 == this.ongoingTouches.length && 1 == this.startingTouches.length) {
             var i = this.ongoingTouchIndexById(e[0].identifier, 0),
                 o = this.startingTouchIndexById(e[0].identifier, 0),
@@ -3134,6 +3156,7 @@ o3v.InputHandler.prototype.handleTouchMove = function (t) {
                     modifiers: {}
                 }]);
         }
+        //双指缩放
         if (2 == this.ongoingTouches.length && 2 == this.startingTouches.length) {
             var u = 0,
                 p = 1,
@@ -3179,8 +3202,8 @@ o3v.InputHandler.prototype.handleMouseDown = function (t) {
 o3v.InputHandler.prototype.handleMouseUp = function (t) {
     if (this.setCaptureHack) {
         //console.log("hey a forgotten sorrow!!!");
-        this.setCaptureHack.mouseup(t);
-        this.setCaptureHack=0;
+        //this.setCaptureHack.mouseup(t);
+        //this.setCaptureHack=0;
     }
     this.shiftKey_ = t.shiftKey;
     var e = this.delegate(o3v.InputHandler.MOUSEHOLD, this.lastMouseDownTarget_, [!1, t]);
@@ -3203,7 +3226,8 @@ o3v.InputHandler.prototype.handleMouseUp = function (t) {
     this.mouseDown_ = !1
 },
 o3v.InputHandler.prototype.handleMouseMove = function (t) {
-    if (this.setCaptureHack) return void this.setCaptureHack.hackMove(t);
+    if (!isMobile && this.setCaptureHack) 
+        return void this.setCaptureHack.hackMove(t);
     var e = !1,
         i = t.clientX - this.lastMousePosition_[0],
         o = t.clientY - this.lastMousePosition_[1];
@@ -3554,6 +3578,8 @@ o3v.MainUI = function (t) {
         position: "absolute",
         width: "100%",
         height: "100%",
+        //overflow: "hidden",
+        //"white-space": "nowrap",
         "z-index": o3v.uiSettings.ZINDEX_VIEWER
     }).attr("id", "viewer"),
     this.canvas_ = $("#viewer")[0],
@@ -3569,7 +3595,7 @@ o3v.MainUI = function (t) {
         top: "10px",
         "z-index": o3v.uiSettings.ZINDEX_MAINUI
     }).click(function () {
-        this.navHandler(this.NAV_HOME)
+        if(this.navHandler)this.navHandler(this.NAV_HOME)
     }),
     this.timeStamp = 0,
     //加载模型按钮

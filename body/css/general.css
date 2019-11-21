@@ -4,11 +4,6 @@
 	src: local('SansationBold'), url('SansationBold/SansationBold.woff') format('woff'), url('SansationBold/SansationBold.ttf') format('truetype');
 }
 
-body{
-	font-family: Helvetica, Arial, sans-serif;
-	margin: 0;
-}
-
 .ui-widget{
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: 12px;
