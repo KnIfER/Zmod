@@ -1,4 +1,5 @@
 o3v.MODELS = [
+
         {
             id: 'cow_anatomy:131011',
             name: 'cow_anatomy.obj',

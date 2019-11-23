@@ -1510,39 +1510,6 @@ o3v.LayersUI.SliderToggle.prototype.build = function (t) {
         of: t,
         collision: "none"
     }).click(this.toggleSliders.bind(this)),
-    this.helpBtn = $("<div>").appendTo("body").css({
-        position: "absolute",
-        width: "45px",
-        height: "74px",
-        "background-image": "url('body/images/help.png')",
-        "z-index": o3v.uiSettings.ZINDEX_MAINUI_STATUS_UPPER - 1
-    }).position({
-        my: "top",
-        at: "bottom",
-        of: t,
-        collision: "none"
-    }).click(),
-    this.helpInner = $("<div>").appendTo("body").css({
-        position: "absolute",
-        width: "45px",
-        height: "74px",
-        "border-left": "2px solid #dbdbdb",
-        "border-bottom-left-radius": "16px",
-        "border-bottom-right-radius": "16px",
-        "border-bottom": "2px solid #dbdbdb",
-        "border-right": "2px solid #dbdbdb",
-        "border-top": 0,
-        "background-position": "center center",
-        "background-repeat": "no-repeat",
-        "z-index": o3v.uiSettings.ZINDEX_MAINUI_STATUS_UPPER - 1
-    }).position({
-        my: "top",
-        at: "bottom",
-        of: t,
-        collision: "none"
-    }).click(function () {
-        viewer_.toggleHelp_()
-    }),
     this.setArt()
 },
 o3v.LayersUI.SliderToggle.prototype.setArt = function () {
@@ -1941,13 +1908,24 @@ o3v.Label.prototype.refresh = function () {
         delete this.currentLabels_[t]
     }, this),
     o3v.util.forEach(this.currentLabels_, function (t, e) {
-        var i = this.getCoords_(e),
-            o = t.dom;
-        o.style.left = Math.round(t.x + i[0] - o.offsetWidth / 2) + "px",
-        o.style.top = Math.round(t.y + i[1] - o.offsetHeight / 2) + "px"
+        //var i = this.getCoords_(e),
+        //    o = t.dom;
+        //console.log("hey Label???");
+        ////console.log(o);
+        //console.log(t.x);
+        //console.log(t.y);
+        //console.log(i[0]);
+        //console.log(i[1]);
+        //console.log(Math.round(t.x + i[0] - o.offsetWidth / 2));
+        //console.log(Math.round(t.y + i[1] - o.offsetHeight / 2));
+        //o.style.left = Math.round(t.x + i[0] - o.offsetWidth / 2) + "px",
+        //o.style.top = Math.round(t.y + i[1] - o.offsetHeight / 2) + "px"
     }, this),
+    
+    // Find labels that need to be added and add them.
     o3v.util.forEach(t, function (t, e) {
         if (!this.currentLabels_[e]) {
+            console.log("hey adding lables!!!"+e);
             var i = this.getCoords_(e),
                 o = $._(this.entityStore_.getEntity(e).name),
                 n = this.types_[t.type].className,
@@ -1955,9 +1933,15 @@ o3v.Label.prototype.refresh = function () {
                 a = $('<div id="inner-label">').addClass(n).text(o).appendTo(s),
                 r = a.get(0),
                 h = s.get(0);
-            h.style.left = Math.round(i[0] - h.offsetWidth / 2) + "px",
-            h.style.top = Math.round(i[1] - h.offsetHeight / 2) + "px",
-            downfunction=function (t) {
+            var wt=h.childNodes[0]; if(wt==undefined)wt=h;//trimming 
+            var m=document.body.clientWidth-wt.offsetWidth;
+            var x=i[0];x=x<0?0:x>m?m:x;
+            h.style.left = Math.round(x) + "px";
+            m=document.body.clientHeight-wt.offsetHeight;
+            x=i[1];x=x<0?0:x>m?m:x;
+            h.style.top = Math.round(x) + "px"; 
+            
+            downfunc=function (t) {
                     //console.log("hey it's a label got clicked!"+r.setCapture);
                     //console.log(t);
                     //r.setCapture ? r.setCapture() 
@@ -1974,12 +1958,12 @@ o3v.Label.prototype.refresh = function () {
                     a.startY = parseInt(h.style.top.substring(0, h.style.top.length - 2))
                 },
             isMobile?
-            a.on('touchstart',downfunction)
-            :a.mousedown(downfunction)
+            a.on('touchstart',downfunc)
+            :a.mousedown(downfunc)
             ,
             a.hackMove = function (t) {
                 if (a.mouseDown) {
-                    console.log("hey hackMove isMobile!!!");
+                    console.log("hey hackMove hackMove!!!");
                     //console.log(t);
                     var tmp=(t.touches?t.touches[0]:t);
                     if(!tmp) tmp=t;
@@ -2006,7 +1990,7 @@ o3v.Label.prototype.refresh = function () {
                     r.releaseCapture ? r.releaseCapture() : viewer_.inputHandler_.setCaptureHack = null,
                     a.mouseDown && viewer_.changeCallback(),
                     a.mouseDown = !1,
-                    viewer_.inputHandler_.setCaptureHack=0
+                    viewer_.inputHandler_.setCaptureHack=0;
                 }),
             this.inputHandler_.registerHandler(o3v.InputHandler.CLICK, r, this.makeHandler_(e, r, t.type).bind(this), !0),
             this.currentLabels_[e] = {
@@ -2046,14 +2030,18 @@ o3v.Label.prototype.makeHandler2_ = function (t, e, i) {
         i == o3v.Label.TYPE_PIN_EXPANDABLE_ && o - a.left < o3v.Label.EXPAND_ICON_WIDTH_ ? this.selectManager_.expandPinned(t) : this.gestures_.isHideClick(s[o3v.InputHandler.CONTROL], s[o3v.InputHandler.META]) ? this.selectManager_.hide(t) : s[o3v.InputHandler.SHIFT] ? this.selectManager_.unpin(t) : o > a.right - o3v.Label.CLOSE_ICON_WIDTH_ ? this.selectManager_.unpin(t) : (this.selectManager_.select(t), this.selectManager_.haveSelected() ? this.navigator_.goToBBox(this.navigator_.unifyBoundingBoxes(this.selectManager_.getSelected()), !0) : this.navigator_.resetNavParameters())
     }
 },
+//标签点击事件
 o3v.Label.prototype.makeHandler_ = function (t, e, i) {
     return i == o3v.Label.TYPE_SELECT_ || i == o3v.Label.TYPE_SELECT_EXPANDABLE_ ?
     function (o, n, s) {
+        //if(1)return;
         var a = e.getBoundingClientRect(),
             r = a.right - o,
             h = o - a.left;
-        if (h >= 0 && r >= 0 && (h -= o3v.Label.INFO_ICON_WIDTH_) < 0) if (i == o3v.Label.TYPE_SELECT_EXPANDABLE_) this.selectManager_.expandSelected(t);
-        else {
+        if (h >= 0 && r >= 0 && (h -= o3v.Label.INFO_ICON_WIDTH_) < 0) 
+        if (i == o3v.Label.TYPE_SELECT_EXPANDABLE_) //expand
+            this.selectManager_.expandSelected(t);
+        else {//wiki
                 var l = e.parentElement,
                     d = $(l).find("#extra");
                 if (d.length) d.remove();
@@ -2072,11 +2060,29 @@ o3v.Label.prototype.makeHandler_ = function (t, e, i) {
         if (h >= 0 && r >= 0 && (r -= o3v.Label.HIDE_ICON_WIDTH_) < 0) {
                 var c = viewer_.contentManager_.metadata_.entities_[t];
                 if (this.selectManager_.haveSelected()) {
-                    var p = this.navigator_.focusOnEntitiesNav(viewer_.select_.getSelected());
-                    viewer_.navigator_.goToBBoxNav(p, !0)
+                    var sel=viewer_.select_.getSelected();
+                    if(sel){
+                        var selstr=JSON.stringify(viewer_.select_.getSelected());
+                        if(window.selectedNode!=selstr){
+                            var p = this.navigator_.focusOnEntitiesNav(sel);
+                            viewer_.navigator_.goToBBoxNav(p, !0)
+                            window.selectedNode=selstr;
+                        }else{
+                            window.selectedNode=null;
+                            viewer_.navigator_.resetNavParameters();
+                        }
+                        
+                    }
                 }
             }
-        h >= 0 && r >= 0 && (s[o3v.InputHandler.SHIFT] ? this.selectManager_.pin(t) : this.gestures_.isHideClick(s[o3v.InputHandler.CONTROL], s[o3v.InputHandler.META]) ? this.selectManager_.hide(t) : o3v.util.getObjectCount(this.selectManager_.getSelected()) > 1 ? this.selectManager_.select(t) : this.selectManager_.clearSelected()),
+        if(h >= 0 && r >= 0){
+             s[o3v.InputHandler.SHIFT] ?
+             this.selectManager_.pin(t) : 
+            this.gestures_.isHideClick(s[o3v.InputHandler.CONTROL], s[o3v.InputHandler.META]) ? 
+            this.selectManager_.hide(t) : o3v.util.getObjectCount(this.selectManager_.getSelected()) > 1 ? 
+            this.selectManager_.select(t) : 0//this.selectManager_.clearSelected()
+        }
+        
         this.selectManager_.haveSelected() && this.navigator_.goToBBox(this.navigator_.unifyBoundingBoxes(this.selectManager_.getSelected()), !0)
     } : function (o, n, s) {
         var a = e.getBoundingClientRect(),
@@ -2137,7 +2143,7 @@ o3v.navUI = function (t, e, i) {
     };
     this.navHome = $("<div>").appendTo("body").css(o).css({
         left: "32px",
-        top: (isMobile?(32-md):64)+"px"
+        top: (cly?(32-md):64)+"px"
     }).button({
         icons: {
             primary: "ui-icon-home"
@@ -2147,7 +2153,7 @@ o3v.navUI = function (t, e, i) {
         this.reset_()
     }.bind(this));
     var n = this.navHome.get(0);
-    if(!isMobile)
+    if(!cly)
     this.navUp = $("<div>").appendTo("body").css(o).button({
         icons: {
             primary: "ui-icon-triangle-1-n"
@@ -2219,7 +2225,7 @@ o3v.navUI = function (t, e, i) {
     }).position({
         my: "top",
         at: "bottom",
-        of: (isMobile?this.navHome:this.navDown).get(0),
+        of: (cly?this.navHome:this.navDown).get(0),
         offset: "-15 3",
         collision: "none"
     }).mousedown(function () {
@@ -2236,7 +2242,7 @@ o3v.navUI = function (t, e, i) {
     }).position({
         my: "top",
         at: "bottom",
-        of: (isMobile?this.navHome:this.navDown).get(0),
+        of: (cly?this.navHome:this.navDown).get(0),
         offset: "15 3",
         collision: "none"
     }).mousedown(function () {
@@ -2271,7 +2277,15 @@ o3v.navUI = function (t, e, i) {
         width: "26px",
         height: "26px"
     }, function () {
-        window.open("http://www.youtube.com/watch?v=M5TysvPJMVo", "_blank")
+        var dis;
+        if(window.hideUI){
+            window.hideUI=0;
+            dis='block';
+        }else{
+            window.hideUI=1;
+            dis='none';
+        }
+        hideLeft(dis);
     }.bind(this)),
     
     this.navMode = zg.PushButton({
@@ -2284,20 +2298,19 @@ o3v.navUI = function (t, e, i) {
     }, function (jev) {
         //tg
         console.log("hey tools!!!");
-        //console.log(window.viewer_.contentManager_.metadata_.autocompleteList_);
+        console.log(window.viewer_.contentManager_.metadata_.autocompleteList_);
         //console.log(o3v.MODELS);
-        var t="ventricles";
-        var this_=window.viewer_;
-        if (this_.loadedMetadata_ && this_.loadedModel_) {
-            var e = this_.contentManager_.getMetadata().searchToEntityIds(t);
-            console.log(e);
-            if (this_.select_.selectMultiple(e), this_.select_.haveSelected()) {
-                this_.opacity_.exposeSelected();
-                var i = this_.navigator_.focusOnEntities(this_.select_.getSelected());
-                this_.navigator_.goToBBox(i)
-            } else this_.navigator_.resetNavParameters()
-        }
         
+        //window.viewer_.navigator_.setOrbitMode(1);
+        
+        var t="body";
+        var this_=window.viewer_.selectCallback(t);
+        
+        
+        //stub , residue, sad
+        //window.viewer_.explodeRange=100.0;
+        //window.viewer_.toolMode=o3v.Viewer.TOOL_EXPLODE;
+        //window.viewer_.changeCallback();  
     }.bind(this)),
     
     this.freeRide = [], 
@@ -2688,16 +2701,21 @@ o3v.Navigator.prototype.projectedMinMax = function (t, e) {
 },
 o3v.Navigator.prototype.unifyBoundingBoxes = function (t) {
     var e;
-    return o3v.log.info("focusing on entities", t),
+    //o3v.log.info("focusing on entities", t);
     o3v.util.forEach(t, function (t) {
         e = o3v.growBBox(e, t.bbox)
-    }),
-    e
+    });
+    return e;
 },
 o3v.Navigator.prototype.focusOnEntities = function (t) {
     var e;
-    return o3v.util.isEmpty(t) ? (o3v.log.info("focusOnEntities empty; resetting view"), this.resetNavParameters()) : (o3v.log.info("focusing on entities", t), e = this.unifyBoundingBoxes(t)),
-    e
+    if(o3v.util.isEmpty(t)){
+        //this.resetNavParameters()
+    }else{
+        //o3v.log.info("focusing on entities", t);
+        e = this.unifyBoundingBoxes(t);
+    }
+    return e;
 },
 o3v.Navigator.prototype.focusOnEntitiesNav = function (t) {
     var e;
@@ -2803,12 +2821,13 @@ o3v.Navigator.prototype.recalculate = function () {
     t
 },
 o3v.Navigator.prototype.doNavigate = function (t, e, i, o, n, s, a, r, h, l) {
+    navigating=!0;
     var d = !1;
     o || (o = 0),
     n || (n = 0),
     s || (s = 0),
     a || (a = 0),
-    this.doOrbit && (l && l.ctrlKey && (d = !0), d ? (this.extra.x.setFuture(o), this.extra.y.setFuture(n), this.extra.z.setFuture(s)) : this.extra.ry.setFuture(a));
+    this.doOrbit && (l && (righter || l.ctrlKey) && (d = !0), d ? (this.extra.x.setFuture(o), this.extra.y.setFuture(n), this.extra.z.setFuture(s)) : this.extra.ry.setFuture(a));
     var c = this.vertMinLimit.getFuture() - this.verticalAdjustment,
         u = this.vertMaxLimit.getFuture() + this.verticalAdjustment;
     d || this.theta.setFuture(t),
@@ -2924,6 +2943,7 @@ o3v.Navigator.prototype.writePreset = function () {
     alert(JSON.stringify(this))
 },
 o3v.InputHandler = function (t) {
+    var p={passive: !0};
     t.addEventListener("mousedown", this.handleMouseDown.bind(this), !1),
     t.addEventListener("mouseup", this.handleMouseUp.bind(this), !1),
     t.addEventListener("mousemove", this.handleMouseMove.bind(this), !1),
@@ -2933,11 +2953,11 @@ o3v.InputHandler = function (t) {
     t.addEventListener("wheel", this.handleScrollWheel.bind(this), !1),
     t.addEventListener("keydown", this.handleKeyDown.bind(this), !1),
     t.addEventListener("keyup", this.handleKeyUp.bind(this), !1),
-    t.addEventListener("touchstart", this.handleTouchStart.bind(this), {passive: !1}),
-    t.addEventListener("touchend", this.handleTouchEnd.bind(this), {passive: !1}),
-    t.addEventListener("touchcancel", this.handleTouchCancel.bind(this), {passive: !1}),
-    t.addEventListener("touchleave", this.handleTouchLeave.bind(this), {passive: !1}),
-    t.addEventListener("touchmove", this.handleTouchMove.bind(this), {passive: !1}),
+    t.addEventListener("touchstart", this.handleTouchStart.bind(this), p),
+    t.addEventListener("touchend", this.handleTouchEnd.bind(this)),
+    t.addEventListener("touchcancel", this.handleTouchCancel.bind(this), p),
+    t.addEventListener("touchleave", this.handleTouchLeave.bind(this), p),
+    t.addEventListener("touchmove", this.handleTouchMove.bind(this), p),
     t.addEventListener("pointerdown", this.handlePointerDown.bind(this)),
     t.addEventListener("pointerup", this.handlePointerUp.bind(this)),
     t.addEventListener("pointermove", this.handlePointerMove.bind(this)),
@@ -2950,7 +2970,7 @@ o3v.InputHandler = function (t) {
         //if(t.cancelable)
        //     t.preventDefault()
     }, {
-       passive: !1
+       passive: !0
     }),
     this.ongoingTouches = [],
     this.startingTouches = [],
@@ -3103,6 +3123,13 @@ o3v.InputHandler.prototype.handleTouchStart = function (t) {
     }
 },
 o3v.InputHandler.prototype.handleTouchEnd = function (t) {
+    if ("inner-label" == t.target.id) {
+        if(this.setCaptureHack){
+            this.setCaptureHack.mouseup(t);
+            this.setCaptureHack=0;
+            window.viewer_.changeCallback();  
+        }
+    }
     if ("viewer" == t.target.id) {
         //console.log(t)
         if(t.cancelable)
@@ -3126,7 +3153,7 @@ o3v.InputHandler.prototype.handleTouchLeave = function (t) {
 },
 //触摸
 o3v.InputHandler.prototype.handleTouchMove = function (t) {
-    console.log("hey handleTouchMove "+t.target.id);
+    //console.log("hey handleTouchMove "+t.target.id);
     if ("inner-label" == t.target.id) {
         console.log("hey handleTouchMove hackMove");
         if (this.setCaptureHack) {
@@ -3193,6 +3220,10 @@ o3v.InputHandler.prototype.handleTouchMove = function (t) {
     }
 },
 o3v.InputHandler.prototype.handleMouseDown = function (t) {
+    //console.log("hey mouse down!!!");
+    navigating=!1;
+    cw=t.which;
+    righter=cw==3;
     this.delegate(o3v.InputHandler.MOUSEHOLD, t.target, [!0, t]),
     this.lastMouseDownTarget_ = t.target,
     this.lastMousePosition_ = [t.clientX, t.clientY],
@@ -3200,12 +3231,18 @@ o3v.InputHandler.prototype.handleMouseDown = function (t) {
     this.mouseDown_ = !0
 },
 o3v.InputHandler.prototype.handleMouseUp = function (t) {
+    //if(1)return;
     if (this.setCaptureHack) {
         //console.log("hey a forgotten sorrow!!!");
-        //this.setCaptureHack.mouseup(t);
-        //this.setCaptureHack=0;
+        if(this.setCaptureHack){
+            this.setCaptureHack.mouseup(t);
+            this.setCaptureHack=0;
+            window.viewer_.changeCallback();  
+        }
     }
+    cw=t.which;
     this.shiftKey_ = t.shiftKey;
+    //if(t.srcElement.id!='inner-label')
     var e = this.delegate(o3v.InputHandler.MOUSEHOLD, this.lastMouseDownTarget_, [!1, t]);
     if (!e) {
         var i = t.clientX - this.lastMousePosition_[0],
@@ -3217,7 +3254,8 @@ o3v.InputHandler.prototype.handleMouseUp = function (t) {
                 t.shiftKey && (s[o3v.InputHandler.SHIFT] = !0),
                 t.metaKey && (s[o3v.InputHandler.META] = !0),
                 0 == t.button && (s[o3v.InputHandler.LEFT] = !0),
-                2 == t.button && (s[o3v.InputHandler.RIGHT] = !0),
+                2 == t.button && (s[o3v.InputHandler.RIGHT] = !0);
+                if(cw!=3)
                 e = this.delegate(o3v.InputHandler.CLICK, this.lastMouseDownTarget_, [t.clientX, t.clientY, s]),
                 e || this.delegate(o3v.InputHandler.CLICK, t.target, [t.clientX, t.clientY])
             } else this.handleMouseMove(t)
@@ -3589,7 +3627,7 @@ o3v.MainUI = function (t) {
     this.canvas_.onmousedown = function () {
         return !1
     },
-    $('<img src="body/images/zygotebody.png">').appendTo("body").css({
+    $('<img id="logo" src="body/images/zygotebody.png" style="visibility:hidden">').appendTo("body").css({
         position: "absolute",
         left: "8px",
         top: "10px",
@@ -3602,10 +3640,10 @@ o3v.MainUI = function (t) {
     this.newModelBtn_ = $("<div>").appendTo("body").css({
         position: "absolute",
         left: "17px",
-        top: (isMobile?(82-md):148)+"px",
+        top: (cly?(82-md):148)+"px",
         width: "45px",
         height: "62px",
-        display: isMobile?"none":"",
+        display: cly?"none":"",
         "border-left": "2px solid #6799CC",
         "border-top-left-radius": "16px",
         "border-top-right-radius": "16px",
@@ -3656,7 +3694,7 @@ o3v.MainUI = function (t) {
     this.modelBtn_ = $("<div>").appendTo("body").css({
         position: "absolute",
         left: "17px",
-        top: (isMobile?(85-md):226)+"px",/*226*/
+        top: (cly?(85-md):226)+"px",/*226*/
         width: "45px",
         height: "10px",
         "border-left": "2px solid #6799CC",
@@ -4345,11 +4383,12 @@ o3v.Viewer.prototype.resetTools = function () {
 o3v.Viewer.prototype.onModelAndMetadataLoad_ = function () {
     this.contentManager_.getMetadata().computeBboxes(this.render_.getBboxes()),
     this.navigator_.resetModel(this.contentManager_.getMetadata().getRootEntity().bbox),
-    this.ui_.showLoadingFeedback(!1),
-    this.historyStarted_ ? (this.navigator_.reset(), this.modelReady ? this.modelReady() : this.history_.checkRestartRestore()) : (this.history_.start(), this.historyStarted_ = !0, this.modelReady ? this.modelReady() : this.history_.checkRestartRestore()),
-    this.modelReady = null,
-    this.changeCallback(),
-    this.navUI_.refresh()
+    this.ui_.showLoadingFeedback(!1);
+    this.historyStarted_ ? (this.navigator_.reset(), this.modelReady ? this.modelReady() : this.history_.checkRestartRestore()) : (this.history_.start(), this.historyStarted_ = !0, this.modelReady ? this.modelReady() : this.history_.checkRestartRestore());
+    this.modelReady = null;
+    this.changeCallback();
+    this.navUI_.refresh();
+    onContentReady();
 },
 o3v.Viewer.prototype.nextModelCallback = function () {
     this.loadedModel_ = !1,
@@ -4389,22 +4428,28 @@ o3v.Viewer.prototype.changeCallback = function (t) {
         if (e = this.select_.recalculate() || e, e = this.opacity_.recalculate() || e, !(e = this.navigator_.recalculate() || e)) return
     }
     this.render_.refresh(this.navigator_.camera),
-    this.label_.refresh(),
+    this.label_.refresh();
+    //if(t) onContentReady();
     window.setTimeout(function () {
         this.changeCallback(!0)
-    }.bind(this), o3v.Viewer.REFRESH_INTERVAL_)
+    }.bind(this), o3v.Viewer.REFRESH_INTERVAL_);
 },
 o3v.Viewer.prototype.selectCallback = function (t) {
     if (this.loadedMetadata_ && this.loadedModel_) {
         var e = this.contentManager_.getMetadata().searchToEntityIds(t);
-        if (this.select_.selectMultiple(e), this.select_.haveSelected()) {
+        this.select_.selectMultiple(e);
+        if (this.select_.haveSelected()) {
             this.opacity_.exposeSelected();
             var i = this.navigator_.focusOnEntities(this.select_.getSelected());
-            this.navigator_.goToBBox(i)
+            this.navigator_.goToBBox(i);
         } else this.navigator_.resetNavParameters()
     }
 },
 o3v.Viewer.prototype.handleClick = function (t, e, i) {
+    //console.log("hey viewer click");
+    //console.log(t);
+    //console.log(e);
+    //console.log(i);
     var o = {},
         n = this.render_.identify(t, e, o);
     if (this.dragTate = 0 < o.value && o.value < 100 ? o.value : null, n) {
@@ -4421,7 +4466,7 @@ o3v.Viewer.prototype.handleClick = function (t, e, i) {
                     this.navigator_.goToBBox(r, !0)
                 }
         } else this.select_.clearSelection(),
-    this.navigator_.doOrbit || this.navigator_.resetNavParameters(),
+    //this.navigator_.doOrbit || this.navigator_.resetNavParameters(),
     this.quiz_.hide();
     this.changeCallback()
 };

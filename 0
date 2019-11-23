@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-    <title>Zygote Body 3D Anatomy Online Visualizer | Offline Human Anatomy 3D</title>
+    <title>Open 3D viewer | Unofficial ZMod</title>
 
     <meta http-equiv="content-type" content="text/html;charset=UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
@@ -51,11 +51,63 @@
     <script type="text/javascript" src="body/scripts/webgl.js"></script>
 
     <script>
+		var navigating;
+		var righter;
         var md=30;
         var isMobile;
+		var cly=isMobile|window.framed;
+		cly=isMobile|1;
+        var cw;
         isMobile=(/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent));
         //isMobile=1;
         //isMobile=0;
+		window.oncontextmenu = function(e){
+			if(navigating)
+				e.preventDefault();
+		}
+		//window.readyCallback=function(){
+		//	window.viewer_.selectCallback("heart")
+		//}
+		function hideGroup(g, dis){
+			for(var i=0;i<g.length;i++)
+				g[i][0].style.display=dis
+		}
+		function hideLeft(dis){
+			hideGroup(window.viewer_.layersUI_.icons_.activeIcons, dis);
+			hideGroup(window.viewer_.layersUI_.icons_.inactiveIcons, dis);
+			window.viewer_.ui_.modelBtn_[0].style.display=dis;
+			window.viewer_.layersUI_.singleSlider_.slider[0].style.display=dis;
+			hideGroup(window.viewer_.layersUI_.multiSlider_.sliders, dis);
+			window.viewer_.layersUI_.sliderToggle_.button[0].style.display=dis;
+			window.viewer_.navUI_.navHome[0].style.display=dis;
+			window.viewer_.navUI_.navLeft[0].style.display=dis;
+			window.viewer_.navUI_.navRight[0].style.display=dis;
+			window.viewer_.navUI_.navZoomIn[0].style.display=dis;
+			window.viewer_.navUI_.navZoomOut[0].style.display=dis;
+			$("#logo")[0].style.display=dis;
+			if(!cly){
+				window.viewer_.navUI_.navUp[0].style.display=dis;
+				window.viewer_.navUI_.navDown[0].style.display=dis;
+			}
+		}
+		function hideAll(){
+			var dis;
+			if(window.noUI){
+				window.noUI=0;
+				dis='block';
+			}else{
+				window.noUI=1;
+				dis='none';
+			}
+			if(!(!window.noUI&&window.hideUI))
+				hideLeft(dis);
+			window.viewer_.search_.searchbox_[0].style.display=dis;
+			window.viewer_.navUI_.navMode[0].style.display=dis;
+			window.viewer_.navUI_.navReset0[0].style.display=dis;
+			window.viewer_.navUI_.navHelp[0].style.display=dis;
+			$("#copyright")[0].style.display=dis;
+			console.log();
+		}
     </script>
     
     
@@ -75,6 +127,16 @@
             // This variable should NEVER be accessed from code.
             window.viewer_ = new o3v.Viewer();
         });
+		
+		function onContentReady(){
+			if(window.viewer_.loadedMetadata_ && window.viewer_.loadedModel_){
+				if(window.readyCallback){
+					window.readyCallback();
+					window.readyCallback();
+					window.readyCallback=null;
+				}
+			}
+		}
     </script>
 
     <style>
@@ -96,22 +158,10 @@
 <!-- Container for labels -->
 <!-- TODO(dkogan): dynamically create this and use css -->
 <div id="labelcontainer" style="width:0px; height:0px; left:0px; top:0px; position:absolute; z-index:5"></div>
-<div id="account-line" style="display:none">
-    <div id="account-links">
-        <a href="settings" target="_blank">Your Settings</a>
-        &nbsp;&nbsp;|&nbsp;&nbsp;
-        <a href="logout">Logout</a>
-    </div>
-
-    <div id="account-name" class="account-name">
-    </div>
-</div>
 
 <div id="guest-line" style="display:none">
     <div id="account-links">
-        <a href="welcome" target="_blank">Learn More</a>
-        &nbsp;&nbsp;|&nbsp;&nbsp;
-        <a href="login">Sign In</a>
+        <a onclick="hideAll()">ZMod</a>
     </div>
     <a href="pricing">
         <div id="account-type"><a href="pricing"><div class="acct_type_btn_lite"></div></a></div>
