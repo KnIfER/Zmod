@@ -15,5 +15,5 @@ MOD:
 -Won't hide label on click.  
 -Won't reset viewport after dissmissing label.  
   
--Toggle entitiy focus.  
+-Entitiy box-focus on toggable by box icon.  
 -Selectable label texts.  
