@@ -1288,7 +1288,7 @@ o3v.LayersUI.SingleSlider = function (t) {
     this.HANDLE_WIDTH = 51
 },
 o3v.LayersUI.SingleSlider.prototype.build = function (t, e) {
-    console.log("hey here is a t!!!");
+    console.log("hey here is a 't'!!!");
     console.log(t);
     this.numLayers = e,
     this.slider && this.slider.remove(),
@@ -1925,14 +1925,20 @@ o3v.Label.prototype.refresh = function () {
     // Find labels that need to be added and add them.
     o3v.util.forEach(t, function (t, e) {
         if (!this.currentLabels_[e]) {
-            console.log("hey adding lables!!!"+e);
+            console.log("hey adding lables---!!!"+e);//标签
+            var o = $._(this.entityStore_.getEntity(e).name);
+            o="123123";
+                
             var i = this.getCoords_(e),
-                o = $._(this.entityStore_.getEntity(e).name),
                 n = this.types_[t.type].className,
                 s = $('<div id="outer-label">').addClass("outer_label").appendTo(this.labelContainer_),
-                a = $('<div id="inner-label">').addClass(n).text(o).appendTo(s),
+                a = $('<div id="inner-label">').addClass(n).appendTo(s),
                 r = a.get(0),
                 h = s.get(0);
+            s[0].noword=1;
+            a[0].noword=1;
+            var tt = $('<span id="inner-label">').text(o).appendTo(a);
+            a[0].innerHTML='&nbsp;'+a[0].innerHTML;
             var wt=h.childNodes[0]; if(wt==undefined)wt=h;//trimming 
             var m=document.body.clientWidth-wt.offsetWidth;
             var x=i[0];x=x<0?0:x>m?m:x;
@@ -1942,7 +1948,7 @@ o3v.Label.prototype.refresh = function () {
             h.style.top = Math.round(x) + "px"; 
             
             downfunc=function (t) {
-                    //console.log("hey it's a label got clicked!"+r.setCapture);
+                    console.log("hey it's a label got clicked!"+r.setCapture);
                     //console.log(t);
                     //r.setCapture ? r.setCapture() 
                     //: 
@@ -1961,6 +1967,11 @@ o3v.Label.prototype.refresh = function () {
             a.on('touchstart',downfunc)
             :a.mousedown(downfunc)
             ,
+            tefunc=function (t) {
+                //mb-dispearing-bug
+                h.style.left = parseInt(h.style.left.substring(0, h.style.left.length - 2)) + ".1px";
+            },
+            a.on('touchend',tefunc),
             a.hackMove = function (t) {
                 if (a.mouseDown) {
                     console.log("hey hackMove hackMove!!!");
@@ -1991,7 +2002,7 @@ o3v.Label.prototype.refresh = function () {
                     a.mouseDown && viewer_.changeCallback(),
                     a.mouseDown = !1,
                     viewer_.inputHandler_.setCaptureHack=0;
-                }),
+                 }),
             this.inputHandler_.registerHandler(o3v.InputHandler.CLICK, r, this.makeHandler_(e, r, t.type).bind(this), !0),
             this.currentLabels_[e] = {
                     type: t.type,
@@ -3123,6 +3134,9 @@ o3v.InputHandler.prototype.handleTouchStart = function (t) {
     }
 },
 o3v.InputHandler.prototype.handleTouchEnd = function (t) {
+    if(t.target.tagName != 'INPUT') {
+		$('input').blur()
+	}
     if ("inner-label" == t.target.id) {
         if(this.setCaptureHack){
             this.setCaptureHack.mouseup(t);
@@ -3155,12 +3169,14 @@ o3v.InputHandler.prototype.handleTouchLeave = function (t) {
 o3v.InputHandler.prototype.handleTouchMove = function (t) {
     //console.log("hey handleTouchMove "+t.target.id);
     if ("inner-label" == t.target.id) {
-        console.log("hey handleTouchMove hackMove");
+        //console.log("hey handleTouchMove hackMove");
+        if(window.getSelection())window.getSelection().empty()
         if (this.setCaptureHack) {
             this.setCaptureHack.hackMove(t);
         }
     }
     else if ("viewer" == t.target.id) {
+        if(window.getSelection())window.getSelection().empty();
         if(t.cancelable)
             t.preventDefault();
         var e = void 0 !== t.changedTouches ? t.changedTouches : [t];

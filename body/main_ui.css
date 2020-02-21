@@ -63,7 +63,7 @@ html {
 
 .label_select, .label_select_expandable, .label_pin, .label_pin_expandable, .label_hide {
     position: absolute;
-    border-radius: 3px;
+    border-radius: 6px;
     white-space: nowrap;
     font-family: arial, sans-serif;
     font-size: 12px;
@@ -82,7 +82,7 @@ html {
     background-image: url('img/label_hide_pin_close.png'), url('img/label_info.png');
     background-position: right top 4px, left top 4px;
     background-color: #fff;
-    border: 1px solid #333;
+    border: 1px solid #2b4381;
     color: #333;
     z-index: 5;
 
