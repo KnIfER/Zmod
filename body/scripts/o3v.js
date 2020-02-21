@@ -1969,7 +1969,8 @@ o3v.Label.prototype.refresh = function () {
             ,
             tefunc=function (t) {
                 //mb-dispearing-bug
-                h.style.left = parseInt(h.style.left.substring(0, h.style.left.length - 2)) + ".1px";
+                //h.style.left = parseInt(h.style.left.substring(0, h.style.left.length - 2)) + ".1px";
+                label_.refresh();
             },
             a.on('touchend',tefunc),
             a.hackMove = function (t) {
@@ -2002,6 +2003,7 @@ o3v.Label.prototype.refresh = function () {
                     a.mouseDown && viewer_.changeCallback(),
                     a.mouseDown = !1,
                     viewer_.inputHandler_.setCaptureHack=0;
+                    tefunc();
                  }),
             this.inputHandler_.registerHandler(o3v.InputHandler.CLICK, r, this.makeHandler_(e, r, t.type).bind(this), !0),
             this.currentLabels_[e] = {
@@ -2053,14 +2055,15 @@ o3v.Label.prototype.makeHandler_ = function (t, e, i) {
         if (i == o3v.Label.TYPE_SELECT_EXPANDABLE_) //expand
             this.selectManager_.expandSelected(t);
         else {//wiki
-                var l = e.parentElement,
-                    d = $(l).find("#extra");
-                if (d.length) d.remove();
-                else {
-                        var c = this.selectManager_.entityStore_.getEntity(t),
-                            u = $('<div id="extra">').addClass("wiki").appendTo(l);
-                        u.load("body/wiki/" + c.externalId)
-                    }
+                //var l = e.parentElement,
+                //    d = $(l).find("#extra");
+                //if (d.length) d.remove();
+                //else {
+                //        var c = this.selectManager_.entityStore_.getEntity(t),
+                //            u = $('<div id="extra">').addClass("wiki").appendTo(l);
+                //        u.load("body/wiki/" + c.externalId)
+                //    }
+                viewer_.toggleFocus(t)
             }
         if (h >= 0 && r >= 0 && (r -= o3v.Label.CLOSE_ICON_WIDTH_) < 0 && this.selectManager_.unselect(t), h >= 0 && r >= 0 && (r -= o3v.Label.PIN_ICON_WIDTH_) < 0 && this.selectManager_.pin(t), h >= 0 && r >= 0 && (r -= o3v.Label.HIDE_ICON_WIDTH_) < 0) {
                 var c = viewer_.contentManager_.metadata_.entities_[t];
@@ -2069,22 +2072,7 @@ o3v.Label.prototype.makeHandler_ = function (t, e, i) {
                 this.selectManager_.unselect(t)
             }
         if (h >= 0 && r >= 0 && (r -= o3v.Label.HIDE_ICON_WIDTH_) < 0) {
-                var c = viewer_.contentManager_.metadata_.entities_[t];
-                if (this.selectManager_.haveSelected()) {
-                    var sel=viewer_.select_.getSelected();
-                    if(sel){
-                        var selstr=JSON.stringify(viewer_.select_.getSelected());
-                        if(window.selectedNode!=selstr){
-                            var p = this.navigator_.focusOnEntitiesNav(sel);
-                            viewer_.navigator_.goToBBoxNav(p, !0)
-                            window.selectedNode=selstr;
-                        }else{
-                            window.selectedNode=null;
-                            viewer_.navigator_.resetNavParameters();
-                        }
-                        
-                    }
-                }
+                viewer_.toggleFocus(t)
             }
         if(h >= 0 && r >= 0){
              s[o3v.InputHandler.SHIFT] ?
@@ -4449,6 +4437,24 @@ o3v.Viewer.prototype.changeCallback = function (t) {
     window.setTimeout(function () {
         this.changeCallback(!0)
     }.bind(this), o3v.Viewer.REFRESH_INTERVAL_);
+},
+o3v.Viewer.prototype.toggleFocus = function (t) {
+    var c = this.contentManager_.metadata_.entities_[t];
+    if (this.select_.haveSelected()) {
+        var sel=this.select_.getSelected();
+        if(sel){
+            var selstr=JSON.stringify(this.select_.getSelected());
+            if(window.selectedNode!=selstr){
+                var p = this.navigator_.focusOnEntitiesNav(sel);
+                this.navigator_.goToBBoxNav(p, !0)
+                window.selectedNode=selstr;
+            }else{
+                window.selectedNode=null;
+                this.navigator_.resetNavParameters();
+            }
+            
+        }
+    }
 },
 o3v.Viewer.prototype.selectCallback = function (t) {
     if (this.loadedMetadata_ && this.loadedModel_) {
