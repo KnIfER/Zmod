@@ -3247,6 +3247,7 @@ o3v.InputHandler.prototype.handleMouseUp = function (t) {
     cw=t.which;
     this.shiftKey_ = t.shiftKey;
     //if(t.srcElement.id!='inner-label')
+    console.log(cw+"cw");
     var e = this.delegate(o3v.InputHandler.MOUSEHOLD, this.lastMouseDownTarget_, [!1, t]);
     if (!e) {
         var i = t.clientX - this.lastMousePosition_[0],
@@ -4493,6 +4494,7 @@ o3v.Viewer.prototype.handleClick = function (t, e, i) {
     this.changeCallback()
 };
 o3v.Viewer.prototype.handleMousehold = function (t, e) {
+    if(1) return !1;
     var i = {};
     this.render_.identify(e.clientX, e.clientY, i);
     if (this.toolMode == o3v.Viewer.TOOL_EXPLODE) return !0;
