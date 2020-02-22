@@ -17,6 +17,6 @@ MOD:
   
 -Entitiy box-focus only toggable by box icon.  
 -Selectable label texts.  
-
+  
 -When you've selected something, short click-and-move won't cause flicker now.  
 -Good transient for entity-selection.  
