@@ -19,4 +19,4 @@ MOD:
 -Selectable label texts.  
   
 -When you've selected something, short click-and-move won't cause flicker now.  
--Good transient for entity-selection.  
+-Good transition for entity-selection.  
