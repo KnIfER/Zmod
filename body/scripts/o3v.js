@@ -1635,8 +1635,9 @@ o3v.SelectManager.prototype.setFutureLayerOpacities_ = function () {
     this.setFuture_(this.OTHER_LAYER_INTERPOLANT, this.NEUTRAL_OPACITY_MODIFIER, this.getEntityOpacityModifier(this.OTHER_LAYER_INTERPOLANT))
 },
 o3v.SelectManager.prototype.setFuture_ = function (t, e, i) {
-    this.interpolants_[t] || (this.interpolants_[t] = new o3v.Interpolant(i)),
-    this.interpolants_[t].setFuture(e)
+    this.interpolants_[t] || (this.interpolants_[t] = new o3v.Interpolant(i));
+    //here alpha-shift-bug
+    this.interpolants_[t].setFuture(e,getEntityName(t)?1:0);
 },
 o3v.SelectManager.prototype.signalChange_ = function (t) {
     this.changeCallback_(),
@@ -1650,7 +1651,7 @@ o3v.SelectManager.prototype.selectEntity_ = function (t) {
             o3v.util.setIfUndefined(this.layerSelectionRefcount_, t, 0),
             this.layerSelectionRefcount_[t]++
         }, this),
-        this.selectedEntities_[t] = e,
+        this.selectedEntities_[t] = e;
         this.setFutureOpacities_(t, i)
     }
 },
@@ -1761,11 +1762,11 @@ o3v.SelectManager.prototype.select = function (t, e) {
     this.selectMultiple([t], e)
 },
 o3v.SelectManager.prototype.selectMultiple = function (t, e) {
-    this.clearSelected(!1, !0),
+    this.clearSelected(!1, !0);
     t.forEach(function (t) {
         this.entityAllowed_(t) && this.selectEntity_(t)
-    }, this),
-    this.signalChange_(e)
+    }, this);
+    this.signalChange_(e);
 },
 o3v.SelectManager.prototype.unselect = function (t, e) {
     this.unselectEntity_(t),
@@ -1927,8 +1928,7 @@ o3v.Label.prototype.refresh = function () {
         if (!this.currentLabels_[e]) {
             console.log("hey adding lables---!!!"+e);//标签
             var o = $._(this.entityStore_.getEntity(e).name);
-            o="123123";
-                
+            //o="123123";
             var i = this.getCoords_(e),
                 n = this.types_[t.type].className,
                 s = $('<div id="outer-label">').addClass("outer_label").appendTo(this.labelContainer_),
@@ -1969,8 +1969,8 @@ o3v.Label.prototype.refresh = function () {
             ,
             tefunc=function (t) {
                 //mb-dispearing-bug
-                //h.style.left = parseInt(h.style.left.substring(0, h.style.left.length - 2)) + ".1px";
-                label_.refresh();
+                h.style.left = parseInt(h.style.left.substring(0, h.style.left.length - 2)) + ".1px";
+                //label_.refresh();
             },
             a.on('touchend',tefunc),
             a.hackMove = function (t) {
@@ -3247,7 +3247,7 @@ o3v.InputHandler.prototype.handleMouseUp = function (t) {
     cw=t.which;
     this.shiftKey_ = t.shiftKey;
     //if(t.srcElement.id!='inner-label')
-    console.log(cw+"cw");
+    //console.log(cw+"cw");
     var e = this.delegate(o3v.InputHandler.MOUSEHOLD, this.lastMouseDownTarget_, [!1, t]);
     if (!e) {
         var i = t.clientX - this.lastMousePosition_[0],
@@ -3449,10 +3449,10 @@ o3v.Interpolant.prototype.tween = function () {
 },
 o3v.Interpolant.tweenAll = function (t) {
     var e = !1;
-    return t.forEach(function (t) {
+    t.forEach(function (t) {
         e |= t.tween()
-    }),
-    e
+    });
+    return e
 },
 o3v.OpacityManager = function (t, e, i) {
     this.layerOpacityManager_ = t,
@@ -3613,8 +3613,11 @@ o3v.OpacityManager.prototype.getOpacityInfo = function (t) {
     return i = this.convertToExternalIds_(i)
 },
 o3v.OpacityManager.prototype.recalculate = function () {
-    var t = !1;
-    return t |= o3v.Interpolant.tweenAll(this.layerOpacityInterpolants_)
+  var updates = false;
+
+  updates |= o3v.Interpolant.tweenAll(
+      this.layerOpacityInterpolants_);
+  return updates;
 },
 o3v.MainUI = function (t) {
     $("<canvas>").appendTo("body").css({
@@ -4488,10 +4491,9 @@ o3v.Viewer.prototype.handleClick = function (t, e, i) {
                     var r = this.navigator_.focusOnEntities(this.select_.getSelected());
                     this.navigator_.goToBBox(r, !0)
                 }
-        } else this.select_.clearSelection(),
+        } else this.select_.clearSelection();
     //this.navigator_.doOrbit || this.navigator_.resetNavParameters(),
-    this.quiz_.hide();
-    this.changeCallback()
+    //this.quiz_.hide();
 };
 o3v.Viewer.prototype.handleMousehold = function (t, e) {
     if(1) return !1;

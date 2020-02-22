@@ -65,6 +65,9 @@
 			if(navigating)
 				e.preventDefault();
 		}
+		window.getEntityName = function(t){
+			return viewer_.contentManager_.metadata_.entities_[t];
+		}
 		//window.readyCallback=function(){
 		//	window.viewer_.selectCallback("heart")
 		//}
